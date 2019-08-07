@@ -1,0 +1,39 @@
+{
+   "checksum": "b2087739b995bdc98ef0b63e1b2618df",
+   "roots": {
+      "bookmark_bar": {
+         "children": [ {
+            "date_added": "13204726735920683",
+            "id": "5",
+            "meta_info": {
+               "last_visited_desktop": "13204731751301514"
+            },
+            "name": "React App",
+            "type": "url",
+            "url": "https://bodiavaleur.github.io/primedate/"
+         } ],
+         "date_added": "13204713575271556",
+         "date_modified": "13204726735920683",
+         "id": "1",
+         "name": "Bookmarks Bar",
+         "type": "folder"
+      },
+      "other": {
+         "children": [  ],
+         "date_added": "13204713575271577",
+         "date_modified": "0",
+         "id": "2",
+         "name": "Other Bookmarks",
+         "type": "folder"
+      },
+      "synced": {
+         "children": [  ],
+         "date_added": "13204713575271587",
+         "date_modified": "0",
+         "id": "3",
+         "name": "Mobile Bookmarks",
+         "type": "folder"
+      }
+   },
+   "version": 1
+}
