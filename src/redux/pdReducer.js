@@ -25,7 +25,8 @@ import {
   SET_SEARCH_FILTERS,
   TOGGLE_SET_OFFLINE,
   SET_OFFSET_INIT,
-  SET_USER_DATA
+  SET_USER_DATA,
+  USE_ONLINE
 } from "./actions";
 
 const initialState = {
@@ -70,7 +71,8 @@ const initialState = {
   autoMpm: false,
   setOffline: false,
   offsetInit: "start",
-  user: []
+  user: [],
+  useOnline: false
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -80,6 +82,9 @@ export default (state = initialState, { type, payload }) => {
 
     case SET_USER_DATA:
       return { ...state, user: payload };
+
+    case USE_ONLINE:
+      return { ...state, useOnline: !state.useOnline };
 
     case SET_OFFSET_INIT:
       return { ...state, offsetInit: payload };

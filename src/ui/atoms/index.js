@@ -21,3 +21,6 @@ export { AttachIcon, AttachIconLabel } from "./AttachIcon";
 export { Line } from "./Line";
 export { IconButton } from "./IconButton";
 export { Button } from "./Button";
+export { Logo } from "./Logo";
+export { FlexContainer } from "./FlexContainer";
+export { UserText, UserWrapper } from "./User";

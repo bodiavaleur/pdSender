@@ -53,10 +53,23 @@ export const ParamLabel = styled.label`
   background: rgba(242, 242, 247, 1);
   padding: 0 10px;
   color: rgb(142, 142, 147);
+  font-family: "SF Display", Arial;
 
   ${({ login }) =>
     login &&
     `
     background: white;
+  `}
+
+  ${({ modal }) =>
+    modal &&
+    `
+    background: none;
+    color: rgb(235, 235, 235, 0.3);
+    font-size: 0.8rem;
+    font-weight: 500;
+    top: auto;
+    left: auto;
+    bottom: 7px;
   `}
 `;

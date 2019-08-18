@@ -12,6 +12,7 @@ import { SET_BLACKLIST, DEL_BLACKLIST } from "../../redux/actions";
 import { PrefItem, PrefGroup } from "../../ui/organisms";
 import { Spring } from "react-spring/renderprops";
 import { getMale } from "../../api";
+import firebaseConfig from "../../firebase/firebaseConfig";
 
 class Blacklist extends Component {
   constructor(props) {

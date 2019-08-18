@@ -29,6 +29,14 @@ export const TextInfoCredits = styled.a`
   justify-content: space-between;
   align-items: center;
   width: 125px;
+
+  ${({ left }) =>
+    left &&
+    `
+    left: 15px;
+    width: 165px;
+    color: white !important;
+  `}
 `;
 
 export const TextInfoMailing = styled.span`

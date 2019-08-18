@@ -1,9 +1,10 @@
-import { fetchFemaleData, getBonuses, getLimit } from "./api";
+import { fetchFemaleData, getBonuses, getLimit, login, logout } from "./api";
 import Iframe from "react-iframe";
 import React, { Component } from "react";
 import ProfilePage from "./components/pages/ProfilePage";
 import SenderPage from "./components/pages/SenderPage";
 import MailingPage from "./components/pages/MailingPage";
+import MagicPage from "./components/pages/MagicPage";
 import { UseGlobalStyle } from "./ui/pages/UseGlobalStyle";
 import "./ui/pages/resets.css";
 import { connect } from "react-redux";
@@ -13,7 +14,9 @@ import {
   TextInfoCredits,
   Button,
   Input,
-  InputGroup
+  InputGroup,
+  Logo,
+  ProfileBackground
 } from "./ui/atoms";
 import TopPanel from "./components/organisms/TopPanel";
 import { TOGGLE_TOP_PANEL } from "./redux/ui/uiActions";
@@ -31,7 +34,6 @@ import "firebase/auth";
 import firebaseConfig from "./firebase/firebaseConfig";
 import PrivateRoute from "./components/atoms/PrivateRoute";
 import { PageWrapper } from "./ui/pages/Login";
-import { ParamLabel, ParamLabelBlock } from "./ui/molecules";
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 const firebaseAppAuth = firebaseApp.auth();
@@ -44,8 +46,8 @@ class PrimeDate extends Component {
     super(props);
 
     this.state = {
-      email: "test@gmail.com",
-      password: "123123123",
+      email: "",
+      password: "",
       loggedIn: false
     };
 
@@ -53,6 +55,7 @@ class PrimeDate extends Component {
     this.countBonuses = this.countBonuses.bind(this);
     this.authUser = this.authUser.bind(this);
     this.handleLoginChange = this.handleLoginChange.bind(this);
+    this.userLogout = this.userLogout.bind(this);
 
     this.state = {
       audio50: document.getElementById("audio50"),
@@ -97,28 +100,51 @@ class PrimeDate extends Component {
     this.setState({ [name]: value });
   }
 
-  authUser() {
+  authUser(email = "", password = "") {
+    email = email ? email : this.state.email;
+    password = password ? password : this.state.password;
     return async () => {
-      await this.props.signInWithEmailAndPassword(
-        this.state.email,
-        this.state.password
+      await this.props.signInWithEmailAndPassword(email, password);
+
+      sessionStorage.setItem("email", email);
+      sessionStorage.setItem("password", password);
+
+      await login(email, password);
+
+      await fetchFemaleData(model =>
+        this.props.dispatch({ type: SET_FEMALE_DATA, payload: model })
       );
-      localStorage.setItem(
-        "authToken",
-        this.props.user ? this.props.user.refreshToken : ""
-      );
+
+      await setInterval(() => this.countBonuses(true), 10000);
       this.setState({ loggedIn: true });
     };
   }
 
+  userLogout() {
+    return async () => {
+      await firebase.auth().signOut();
+      logout();
+      sessionStorage.setItem("email", null);
+      sessionStorage.setItem("password", null);
+      this.setState({ loggedIn: false });
+    };
+  }
+
   componentDidMount() {
-    setInterval(() => this.countBonuses(true), 2000);
-    fetchFemaleData(model =>
-      this.props.dispatch({ type: SET_FEMALE_DATA, payload: model })
-    );
+    const savedEmail = sessionStorage.getItem("email");
+    const savedPwd = sessionStorage.getItem("password");
+
+    if (savedEmail && savedPwd) {
+      login(savedEmail, savedPwd);
+      this.authUser(savedEmail, savedPwd)();
+    } else {
+      logout();
+    }
   }
 
   render() {
+    const isLoggedIn = !!firebase.auth().currentUser;
+    console.log("isLoggedIn :", isLoggedIn);
     document.title = `Sender | ${this.props.currentBonuses}`;
     return (
       <Router>
@@ -126,7 +152,11 @@ class PrimeDate extends Component {
 
         {!!this.props.user &&
           (this.props.showTopPanel ? (
-            <TopPanel toggleTopPanel={this.toggleTopPanel} />
+            <TopPanel
+              user={this.props.user}
+              userLogout={this.userLogout()}
+              toggleTopPanel={this.toggleTopPanel}
+            />
           ) : (
             <ArrowButton onClick={this.toggleTopPanel}>
               <i className="fas fa-chevron-down" />
@@ -148,20 +178,29 @@ class PrimeDate extends Component {
 
         <Switch>
           <PrivateRoute
+            isLoggedIn={isLoggedIn}
             exact
             path={process.env.PUBLIC_URL + "/profile"}
             component={ProfilePage}
           />
           <PrivateRoute
+            isLoggedIn={isLoggedIn}
             exact
             path={process.env.PUBLIC_URL + "/sender"}
             component={SenderPage}
             user={this.props.user}
           />
           <PrivateRoute
+            isLoggedIn={isLoggedIn}
             exact
             path={process.env.PUBLIC_URL + "/mailing"}
             component={MailingPage}
+          />
+          <PrivateRoute
+            isLoggedIn={isLoggedIn}
+            exact
+            path={process.env.PUBLIC_URL + "/magic"}
+            component={MagicPage}
           />
           <Route
             exact
@@ -170,24 +209,26 @@ class PrimeDate extends Component {
           />
         </Switch>
 
-        {!!localStorage.getItem("authToken") ? (
+        {isLoggedIn ? (
           <Redirect to={process.env.PUBLIC_URL + "/profile"} />
         ) : (
           <PageWrapper>
+            <ProfileBackground img="https://www.gizdev.com/wp-content/uploads/2018/11/MacBook-Air-2018-Stock-Walls-2.jpg" />
+            <Logo color="white">Sender</Logo>
             <InputGroup>
-              <ParamLabelBlock>
-                <ParamLabel login>Email</ParamLabel>
-                <Input login name="email" onChange={this.handleLoginChange} />
-              </ParamLabelBlock>
-              <ParamLabelBlock>
-                <ParamLabel login>Password</ParamLabel>
-                <Input
-                  login
-                  name="password"
-                  type="password"
-                  onChange={this.handleLoginChange}
-                />
-              </ParamLabelBlock>
+              <Input
+                login
+                placeholder="Email"
+                name="email"
+                onChange={this.handleLoginChange}
+              />
+              <Input
+                login
+                placeholder="Password"
+                name="password"
+                type="password"
+                onChange={this.handleLoginChange}
+              />
             </InputGroup>
             <Button onClick={this.authUser()}>SIGN IN</Button>
           </PageWrapper>

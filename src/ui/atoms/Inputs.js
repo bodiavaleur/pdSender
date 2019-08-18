@@ -26,6 +26,11 @@ export const Input = styled.input`
     login &&
     `
     margin: 5px;
+    height: 30px;
+
+    ::placeholder {
+      color: #aaa;
+    }
   `}
 `;
 

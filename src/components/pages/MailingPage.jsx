@@ -49,7 +49,7 @@ class MailingPage extends Component {
       offset: 0,
       cycles: 0,
       maxOffset: 0,
-      cursor: "",
+      cursor: "W10=",
       splitMessage: this.props.message.split(" @ "),
       modelId: 0
     };
@@ -59,164 +59,208 @@ class MailingPage extends Component {
   }
 
   stopSender() {
-    this.props.dispatch({ type: SET_SENT_COUNT, payload: 0 });
-
+    document.location.reload();
     for (let i = 0; i < 99999; i++) {
       window.clearTimeout(i);
     }
-
-    this.props.dispatch({ type: LAUNCH_SENDER, payload: false });
-    this.props.dispatch({ type: CLEAR_SENT_MALES });
-    this.props.dispatch({ type: CLEAR_ATTACHMENTS });
-    this.props.dispatch({ type: CLEAR_BOOKMARKS });
-    this.props.dispatch({ type: TOGGLE_SENDER_PAGE });
   }
 
-  sendFn(data) {
-    let cursor = data.cursor ? data.cursor : "";
-    let splitMessage = this.state.splitMessage;
+  sendFn(data, repeat = false) {
+    let cursor = data.cursor;
+    let copyData = data;
+    if (!repeat) {
+      cursor = data.cursor;
+      copyData = data;
+    }
+    let { splitMessage, idx, offset, maxOffset } = this.state;
+    console.log(
+      "splitMessage, idx, offset, maxOffset :",
+      splitMessage,
+      idx,
+      offset,
+      maxOffset
+    );
     data = data.profiles ? data.profiles : data.users;
 
     !!this.props.list.length && (data = this.props.list);
 
-    data = data.filter(
-      x =>
-        x.id !== this.state.modelId &&
-        !this.state.sentMales.includes(x.id) &&
-        !this.props.blacklist.includes(x.id)
-    );
+    data = data.filter(x => x.id !== this.state.modelId);
+    data = data.filter(x => !this.state.sentMales.includes(x.id));
+    data = data.filter(x => !this.props.blacklist.includes(x.id));
 
-    if (this.props.ignoreBm) {
-      data = data.filter(x => !this.props.bookmarks.includes(x.id));
-    }
+    data = this.props.ignoreBm
+      ? data.filter(x => !this.props.bookmarks.includes(x.id))
+      : data;
+
+    data = this.props.useOnline ? data.filter(x => x.is_online) : data;
 
     const timeout = () =>
-      setTimeout(() => {
-        // If data is empty and using repeat switch - start again
-        if (!data.length && this.props.useRepeat) {
-          this.setState({
-            cursor: "",
-            splitMessage: this.props.message.split(" @ "),
-            idx: 0,
-            cycles: this.state.cycles + 1
-          });
-          this.initOffset();
-          this.sendToChat();
-          return;
-        }
+      setTimeout(
+        () => {
+          // If data is empty and using repeat switch - start again
+          // if (!copyData.length && this.props.useRepeat) {
+          //   console.log("repeating...");
+          //   debugger;
+          //   this.setState({
+          //     cursor: "W10=",
+          //     splitMessage: this.props.message.split(" @ "),
+          //     idx: 0,
+          //     cycles: this.state.cycles + 1
+          //   });
+          //   this.setMpm(40);
+          //   !copyData.length
+          //     ? this.initOffset()
+          //     : this.setState({ offset: this.state.offset + 1 });
+          //   console.log("data :", copyData);
+          //   console.log("splitMessage", splitMessage);
+          //   console.log("this.state", this.state);
+          //   this.sendToChat();
+          //   return;
+          // }
 
-        // If sent all messages find new males
-        if (!splitMessage.length) {
-          clearTimeout(timeout);
+          // If sent all messages find new males
+          if (!splitMessage.length || !data.length) {
+            clearTimeout(timeout);
+            !this.props.autoMpm && this.setMpm(1);
 
-          if (this.props.mode !== "all") {
-            this.setState({ offset: data.length + 1 });
-          } else {
-            switch (this.props.offsetInit) {
-              case "start":
-                this.setState({ offset: this.state.offset + 1 });
-                break;
-              case "random":
-                this.setState({
-                  offset: Math.round(Math.random() * this.state.maxOffset)
-                });
-                break;
-              case "end":
-                this.setState({ offset: this.state.offset - 1 });
-                break;
+            if (this.props.mode !== "all") {
+              this.setState({ offset: data.length + 1 });
+            } else {
+              switch (this.props.offsetInit) {
+                case "start":
+                  offset >= maxOffset
+                    ? this.initOffset()
+                    : this.setState({ offset: offset + 1 });
+                  break;
+                case "random":
+                  this.setState({
+                    offset: Math.round(Math.random() * maxOffset)
+                  });
+                  break;
+                case "end":
+                  offset <= 1
+                    ? this.initOffset()
+                    : this.setState({
+                        offset: offset - 1
+                      });
+                  break;
+              }
             }
+
+            this.setState({
+              sentMales: [
+                ...this.state.sentMales,
+                ...data.map(male => male.id)
+              ],
+              splitMessage: this.props.message.split(" @ "),
+              cycles: this.state.cycles + 1
+            });
+
+            this.sendToChat();
+            return;
           }
 
-          this.setState({
-            sentMales: [...this.state.sentMales, ...data.map(male => male.id)],
-            splitMessage: this.props.message.split(" @ "),
-            cursor: cursor
-          });
+          if (idx === data.length) {
+            splitMessage.shift();
+            this.setState({
+              splitMessage: splitMessage,
+              idx: 0,
+              cursor: repeat ? this.state.cursor : cursor
+            });
+            this.sendFn(copyData, (repeat = true));
+            return;
+          }
 
-          this.sendToChat();
-          return;
-        }
+          if (!data[idx].id) {
+            return;
+          }
 
-        // If one message is sent choose another
-        if (this.state.idx === data.length) {
-          splitMessage.shift();
-          this.setState({ splitMessage: splitMessage, idx: 0 });
-          this.sendToChat();
-          return;
-        }
-
-        if (!data[this.state.idx].id) {
-          return;
-        }
-
-        if (this.props.sendType === "chat") {
-          const attach = this.props.attachments.find(
-            el => el.attachTo === splitMessage[0]
-          );
-          if (!!this.props.attachments.length && attach) {
-            sendMessage(
-              data[this.state.idx].id,
-              this.state.modelId,
-              splitMessage[0],
-              resData => {
-                this.setState({ counter: this.state.counter + 1 });
-              }
+          if (this.props.sendType === "chat") {
+            const attach = this.props.attachments.find(
+              el => el.attachTo === splitMessage[0]
             );
-
-            if (attach.type === "sticker") {
-              sendSticker(data[this.state.idx].id, this.state.modelId, attach);
-            } else {
-              sendAttach(
-                data[this.state.idx].id,
+            if (!!this.props.attachments.length && attach) {
+              sendMessage(
+                data[idx].id,
                 this.state.modelId,
-                attach.id,
-                attach.type
+                splitMessage[0],
+                resData => {
+                  !this.props.autoMpm &&
+                    this.setMpm(
+                      parseInt(resData.headers["x-rate-limit-remaining"])
+                    );
+                  this.setState({
+                    counter: this.state.counter + 1
+                  });
+                }
+              );
+
+              if (attach.type === "sticker") {
+                sendSticker(data[idx].id, this.state.modelId, attach);
+              } else {
+                sendAttach(
+                  data[idx].id,
+                  this.state.modelId,
+                  attach.id,
+                  attach.type
+                );
+              }
+            } else {
+              sendMessage(
+                data[idx].id,
+                this.state.modelId,
+                splitMessage[0],
+                resData => {
+                  !this.props.autoMpm &&
+                    this.setMpm(
+                      parseInt(resData.headers["x-rate-limit-remaining"])
+                    );
+                  this.setState({
+                    counter: this.state.counter + 1
+                  });
+                }
               );
             }
-          } else {
-            sendMessage(
-              data[this.state.idx].id,
+          } else if (this.props.sendType === "mail") {
+            sendMail(
               this.state.modelId,
+              data[idx].id,
               splitMessage[0],
-              resData => {
-                this.props.autoMpm &&
-                  this.setMpm(
-                    parseInt(resData.headers["x-rate-limit-remaining"])
-                  );
-                this.setState({ counter: this.state.counter + 1 });
-              }
+              data => {
+                !this.props.autoMpm &&
+                  this.setMpm(parseInt(data.headers["x-rate-limit-remaining"]));
+                this.setState(prevState => ({
+                  counter: this.state.counter + 1
+                }));
+              },
+              this.props.attachments
             );
           }
-        } else if (this.props.sendType === "mail") {
-          sendMail(
-            this.state.modelId,
-            data[this.state.idx].id,
-            splitMessage[0],
-            data => {
-              this.props.autoMpm &&
-                this.setMpm(parseInt(data.headers["x-rate-limit-remaining"]));
-              this.setState({ counter: this.state.counter + 1 });
-            },
-            this.props.attachments
-          );
-        }
 
-        if (this.props.likeUser) {
-          likeMale(data[this.state.idx].id, this.state.modelId);
-        }
+          if (this.props.likeUser) {
+            likeMale(data[idx].id, this.state.modelId);
+          }
 
-        if (this.props.favUser) {
-          addToFavorites(data[this.state.idx].id, this.state.modelId);
-        }
+          if (this.props.favUser) {
+            addToFavorites(data[idx].id, this.state.modelId);
+          }
 
-        if (this.props.setOffline) {
-          setOffline(this.state.modelId);
-        }
+          if (this.props.setOffline) {
+            setOffline(this.state.modelId);
+          }
 
-        this.setState({ idx: this.state.idx + 1 });
+          this.setState({ idx: idx + 1 });
+          idx = idx + 1;
 
-        timeout();
-      }, Math.round(60 / this.props.mpm) * 1000) + 0.6;
+          clearTimeout(timeout);
+          timeout();
+        },
+        this.props.autoMpm
+          ? Math.round(60 / this.props.mpm) * 1000
+          : this.props.mpm < 2
+          ? 3250
+          : 1000
+      );
     timeout();
   }
 
@@ -227,13 +271,13 @@ class MailingPage extends Component {
       case "activeDialogs":
         fetchMales(
           this.props.modeFilters,
-          this.state.offset,
+          0,
           data => this.sendFn(data),
           this.state.cursor
         );
         break;
       case "all":
-        fetchAllMales(this.state.offset, this.props.searchFilters, data =>
+        fetchAllMales(this.state.offset + 1, this.props.searchFilters, data =>
           this.sendFn(data)
         );
         break;
@@ -252,43 +296,50 @@ class MailingPage extends Component {
 
   initOffset() {
     let offsetMode = this.props.offsetInit;
-    let offset;
 
-    switch (offsetMode) {
-      case "start":
-        this.setState({ offset: 0 });
-        break;
-      case "random":
-        fetchAllMales(0, this.props.searchFilters, data => {
-          const maxOffset = Math.round(data.count / 25);
+    fetchAllMales(1, this.props.searchFilters, data => {
+      const maxOffset = Math.round(data.count / 25);
+      console.log("data.count :", data.count);
+
+      switch (offsetMode) {
+        case "start":
+          this.setState({ offset: 1, maxOffset: maxOffset });
+          break;
+        case "random":
           this.setState({
             offset: Math.round(Math.random() * (data.count / 25)),
             maxOffset: maxOffset
           });
-        });
-        break;
-      case "end":
-        fetchAllMales(0, this.props.searchFilters, data =>
-          this.setState({ offset: Math.round(data.count / 25) })
-        );
-        break;
-    }
+          break;
+        case "end":
+          fetchAllMales(1, this.props.searchFilters, data =>
+            this.setState({
+              offset: Math.round(data.count / 25),
+              maxOffset: maxOffset
+            })
+          );
+          break;
+      }
+    });
   }
 
   componentDidMount() {
-    this.setState({ modelId: this.props.modelData.id });
-    this.sendToChat();
-    this.initOffset();
+    if (this.props.senderLaunch) {
+      this.setState({ modelId: this.props.modelData.id });
+      this.sendToChat();
+      this.initOffset();
+    }
   }
 
   render() {
+    console.log("this.props.mpm :", this.props.mpm);
     return (
       <React.Fragment>
         <Spring from={{ opacity: 0 }} to={{ opacity: 1 }}>
           {props => (
             <React.Fragment>
               <ProfileBackground
-                img="https://lh3.googleusercontent.com/-iLjMPpai8yJcd9bZFZNX69JZ35dCBfwN04dbH_o0s5OSvToB-8Pa--XyR1IaW44cObn4gUCOB-JVKu3gfrjvaQnEDKvtu9qs5xmGfDS38mR_BIrG3nq7tiVEQk8cJK7nD1RLw4_rMDZh6kju7BPv_d5LXuKpnz4T-J_z3Mv7XsPLCICnh_vaxXKkNEzrxq9AFXIWJNqfbY-22vY8AmplT8MxVv7_qXOZi603AQpJ6NB7R3rsfOcGpaAEmm-8aA2UIHSVF3JKHHQdXTFxqh1w5hgojVh5ZLxDYdYdEZSxcwd17FJnb0alud_aQ5EFSVV-RafxxxT-J4AvK4XkzrRNgKcbrheeD46DAQ1HtTARGy0rMtEr-1kPQlAJjLs2ZVyrUJ8nyAJTgXklSvFkuN8vpU8ioCtNOnowtGs8H9Q-1VPTlTMqdUaSLC6xCw8yKf81kquMFyWAJXSrfVISL7DwTAY2JrYj4QkVxDls0lmz-ocWWC2YquJ9p-V595c2wO8Wa5_g3vddYV9tnagu182Vcpt-V9Q0nv9sVEfWJCjhl_7ITp5fXP6jGZuNMiXqcTROAAfeEIPAF6NcPSJBTMrcSPhYN59aJMQxwsLIYaz551cBr2Rptcjr-K1Ve_TGGkpDj7cjk7ihz22b9COkgcTFLWXuIEKjDnDh04JHzkOcMGZLYFBHQiiAZjtVVTA7VMf2c4R9BCTwOmkZKVoP1QNEcxL=w1619-h748-no"
+                img="https://www.gizdev.com/wp-content/uploads/2018/11/MacBook-Air-2018-Stock-Walls-2.jpg"
                 style={props}
               />
               <DisplayMessages>
@@ -315,7 +366,7 @@ class MailingPage extends Component {
                 <TextInfoMailing>
                   Bookmarks: {this.props.bookmarks.length}
                 </TextInfoMailing>
-                <TextInfoMailing>MPM: {this.props.mpm}</TextInfoMailing>
+                <TextInfoMailing>Delay: {this.props.mpm}</TextInfoMailing>
                 <TextInfoMailing>
                   Online: {this.props.currentOnline}
                 </TextInfoMailing>
@@ -330,12 +381,12 @@ class MailingPage extends Component {
                   </Timer>
                 </TextInfoMailing>
 
-                {!this.props.autoMpm && (
+                {this.props.autoMpm && (
                   <Slider
                     orientation="vertical"
-                    min={5}
+                    min={1}
                     max={40}
-                    step={5}
+                    step={1}
                     value={this.props.mpm}
                     tooltip={true}
                     onChange={this.setMpm}
@@ -388,7 +439,8 @@ const mapStateToProps = state => ({
   autoMpm: state.pdReducer.autoMpm,
   searchFilters: state.pdReducer.searchFilters,
   setOffline: state.pdReducer.setOffline,
-  offsetInit: state.pdReducer.offsetInit
+  offsetInit: state.pdReducer.offsetInit,
+  useOnline: state.pdReducer.useOnline
 });
 
 export default connect(mapStateToProps)(MailingPage);

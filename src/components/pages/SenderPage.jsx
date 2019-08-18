@@ -4,7 +4,8 @@ import {
   ProfileBackground,
   ModalGroup,
   Modal,
-  GalleryImage
+  GalleryImage,
+  TextInfoCredits
 } from "../../ui/atoms";
 import { SenderPrefs, PrefGroup } from "../../ui/organisms";
 import {
@@ -17,7 +18,8 @@ import {
   LAUNCH_SENDER,
   SET_CURRENT_ONLINE,
   SET_LISTING,
-  SET_OFFSET_INIT
+  SET_OFFSET_INIT,
+  USE_ONLINE
 } from "../../redux/actions";
 import {
   TOGGLE_BLACKLIST,
@@ -27,7 +29,14 @@ import {
   TOGGLE_PARAMS,
   TOGGLE_LISTING
 } from "../../redux/ui/uiActions";
-import { fetchAllMales, getStickers, getDataDictionary } from "../../api";
+import {
+  fetchAllMales,
+  getStickers,
+  getDataDictionary,
+  getMale,
+  fetchMales,
+  getHistory
+} from "../../api";
 import { loadBookmarks } from "../../utils";
 import MediaGallery from "../organisms/MediaGallery";
 import Blacklist from "../molecules/Blacklist";
@@ -44,6 +53,7 @@ import Listing from "../organisms/Listing";
 import MessageBlock from "../molecules/MessageBlock";
 import { Tab, TabsWrapper } from "../../ui/molecules";
 import { Redirect } from "react-router-dom";
+import { CircleSpinner } from "react-spinners-kit";
 
 class SenderPage extends Component {
   constructor(props) {
@@ -68,7 +78,8 @@ class SenderPage extends Component {
         lastOnline: 2,
         education: ""
       },
-      dataDictionary: {}
+      dataDictionary: {},
+      bmLoaded: false
     };
 
     this.selectMode = this.selectMode.bind(this);
@@ -84,6 +95,8 @@ class SenderPage extends Component {
     this.toggleListing = this.toggleListing.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.setOffsetInit = this.setOffsetInit.bind(this);
+    this.finishBmLoad = this.finishBmLoad.bind(this);
+    this.test = this.test.bind(this);
   }
 
   onRangeChange(value) {
@@ -207,13 +220,18 @@ class SenderPage extends Component {
     return () => this.props.dispatch({ type: SET_OFFSET_INIT, payload: value });
   }
 
+  finishBmLoad() {
+    return this.setState({ bmLoaded: true });
+  }
+
   componentDidMount() {
     loadBookmarks(
       0,
       this.props.bookmarks,
       "",
       this.props.modelData.id,
-      this.props.dispatch
+      this.props.dispatch,
+      this.finishBmLoad
     );
     getDataDictionary(dictData => this.setState({ dataDictionary: dictData }));
     const loadedBlacklist = localStorage.getItem("blacklist");
@@ -232,27 +250,33 @@ class SenderPage extends Component {
     getStickers(packs => this.setState({ packs: packs }));
   }
 
+  test() {
+    getHistory(32375252, 30807359, 1560533215, data =>
+      console.log("data :", data)
+    );
+  }
+
   render() {
     const messages = this.props.message.split(" @ ").filter(x => !!x);
-
     return (
       <React.Fragment>
         <Spring from={{ opacity: 0 }} to={{ opacity: 1 }}>
           {props => (
             <React.Fragment>
               <ProfileBackground
-                img="https://lh3.googleusercontent.com/fUHfRrhDwRlEWHqCpE9zYvX3siwpPHqfFCpyYv-EpqF5fm89t2JFqsNDAHPOsdB3HPFp5dhSwlRIiZ5mygsbNWcCzOPEK-wahu0xPhOawRwPRtwnBFjvegcudltsqfllRb8ro5tqRIAYMMpDIHGWlFXqdXHxivdRqpXDKoCw7vjGnavv7iT5lQe0hrYzdpXDyrx_zsT6eEwWTRuxQsF36FKweG65hG_-eoqDaMFJAbubTKztI--zEaxqFZa5rBAtqTl899pWa9wZozwZBB4Gd4U6fjLMJ4EBXNs_8Zvv8KHKLjH__vAtnQsY2SGQ_sehkvFAVu4H-u20Aj_BWcinvOeDwZh5w7iUeBubZX-JV-zh9j_aXweVf3P8rLolr0cRrGodO5Bus6VFZNzh8biYf5w0PSYCFmQuJ4lBo308y21mNZCtnEhsbC0ttYIqBQXEA33SJGarWFpYZ_pTgkPCusKaU9zeLsJ56GnVlfhIkgML54SOzYd39v_UuL_JVM-TtDtLNhNm4El1zYOIO5sxnHBZJgZSOSFuw2qQ2zmh6x-0CUfuAM-99kvpSabnGoYCQ-rrfvYghVwe8IkVKPTy-c0HcWNV43w4b5Z8S9ysChOC-AIoUq4cS_cpLFUIc1wwHh4qzV7hbeGYMbKNTnkEOC5XF5D3EEQqOxVVedP3CBjqNPV6-w6mrhV2dEiQJLq-RVhPDCAQGKm20LvxXiZHSwlF=w1533-h862-no"
+                img="https://cdn.themefoxx.com/wp-content/uploads/2018/07/MacBook-Air-2018-Wallpapers-4.jpg"
                 style={props}
               />
               <SenderPrefs style={props}>
                 <SendType />
-
                 <RightPanel
                   startSender={this.startSender}
                   toggleBlacklist={this.toggleBlacklist}
                   toggleSendParams={this.toggleSendParams}
                   toggleListing={this.toggleListing}
                 />
+
+                <button onClick={this.test}>test</button>
 
                 <MessageGroup
                   message={this.props.message}
@@ -340,6 +364,10 @@ class SenderPage extends Component {
 
                 {this.props.showAttachments && (
                   <Attachments
+                    stickersTab
+                    photo
+                    video
+                    audio
                     stickers={this.state.packs}
                     toggleAttachments={this.toggleAttachments}
                   />
@@ -355,6 +383,13 @@ class SenderPage extends Component {
                   />
                 )}
               </SenderPrefs>
+
+              {!this.state.bmLoaded && (
+                <TextInfoCredits left>
+                  <CircleSpinner size={20} color="white" loading={true} />
+                  Loading bookmarks...
+                </TextInfoCredits>
+              )}
             </React.Fragment>
           )}
         </Spring>
@@ -389,7 +424,8 @@ const mapStateToProps = state => ({
   list: state.pdReducer.list,
   useRepeat: state.pdReducer.useRepeat,
   searchFilters: state.pdReducer.searchFilters,
-  offsetInit: state.pdReducer.offsetInit
+  offsetInit: state.pdReducer.offsetInit,
+  useOnline: state.pdReducer.useOnline
 });
 
 export default connect(mapStateToProps)(SenderPage);

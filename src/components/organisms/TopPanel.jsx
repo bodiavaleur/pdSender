@@ -5,7 +5,12 @@ import {
   Shade,
   NavbarItem,
   NavbarItemIcon,
-  NavbarItemLabel
+  NavbarItemLabel,
+  UserText,
+  ProfileAvatar,
+  UserWrapper,
+  Button,
+  Line
 } from "../../ui/atoms";
 import {
   TOGGLE_SENDER_PAGE,
@@ -51,22 +56,48 @@ class TopPanel extends Component {
           {props => (
             <TopBar style={props}>
               <NavbarWrapper>
-                <Link to="/profile">
-                  <NavbarItem>
-                    <NavbarItemIcon>
-                      <i className="far fa-user" />
-                    </NavbarItemIcon>
-                    <NavbarItemLabel>Profile</NavbarItemLabel>
-                  </NavbarItem>
-                </Link>
-                <Link to="/sender">
-                  <NavbarItem>
-                    <NavbarItemIcon>
-                      <i className="far fa-paper-plane" />
-                    </NavbarItemIcon>
-                    <NavbarItemLabel>Sender</NavbarItemLabel>
-                  </NavbarItem>
-                </Link>
+                <NavbarWrapper links>
+                  <Link to={process.env.PUBLIC_URL + "/profile"}>
+                    <NavbarItem>
+                      <NavbarItemIcon>
+                        <i className="far fa-user" />
+                      </NavbarItemIcon>
+                      <NavbarItemLabel>Profile</NavbarItemLabel>
+                    </NavbarItem>
+                  </Link>
+
+                  <Link to={process.env.PUBLIC_URL + "/sender"}>
+                    <NavbarItem>
+                      <NavbarItemIcon>
+                        <i className="far fa-paper-plane" />
+                      </NavbarItemIcon>
+                      <NavbarItemLabel>Sender</NavbarItemLabel>
+                    </NavbarItem>
+                  </Link>
+
+                  <Link to={process.env.PUBLIC_URL + "/magic"}>
+                    <NavbarItem>
+                      <NavbarItemIcon>
+                        <i className="fas fa-magic" />
+                      </NavbarItemIcon>
+                      <NavbarItemLabel>Magic</NavbarItemLabel>
+                    </NavbarItem>
+                  </Link>
+                </NavbarWrapper>
+                <UserWrapper>
+                  <UserWrapper text>
+                    <UserText>{this.props.user.email.split("@")[0]}</UserText>
+                    <UserText email>{this.props.user.email}</UserText>
+                  </UserWrapper>
+                  <ProfileAvatar
+                    w="32px"
+                    h="32px"
+                    src="http://mumbaigrill.com.au/img/user.png"
+                  />
+                  <Button logout onClick={this.props.userLogout}>
+                    Log out
+                  </Button>
+                </UserWrapper>
               </NavbarWrapper>
             </TopBar>
           )}

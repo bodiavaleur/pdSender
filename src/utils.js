@@ -15,12 +15,9 @@ export const loadBookmarks = (
   bookmarks,
   cursor,
   modelId,
-  dispatchFn
+  dispatchFn,
+  finishBmFn
 ) => {
-  if (bookmarks.length >= 1000) {
-    return;
-  }
-
   fetchMales(
     {
       bookmarked: 1,
@@ -32,10 +29,23 @@ export const loadBookmarks = (
     data => {
       let cursor = data.cursor;
       data = data.profiles;
+
+      if (!data.length) {
+        finishBmFn({ bmLoaded: true });
+        return;
+      }
+
       for (let bmIdx = 0; bmIdx < data.length; bmIdx++) {
         if (bmIdx === data.length - 1) {
           bmOffset += data.length;
-          loadBookmarks(bmOffset, bookmarks, cursor, modelId, dispatchFn);
+          loadBookmarks(
+            bmOffset,
+            bookmarks,
+            cursor,
+            modelId,
+            dispatchFn,
+            finishBmFn
+          );
         }
 
         bookmarks.push(data[bmIdx].id);
@@ -44,5 +54,7 @@ export const loadBookmarks = (
     cursor
   );
 
+  bookmarks = bookmarks.filter(x => x !== modelId);
+  bookmarks = [...new Set(bookmarks)];
   dispatchFn({ type: SET_BOOKMARKS, payload: bookmarks });
 };

@@ -83,4 +83,10 @@ export const UseGlobalStyle = createGlobalStyle`
     text-decoration: none !important;
     outline:none !important;
   }
+
+  .tooltip {
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+  }
 `;

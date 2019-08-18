@@ -5,9 +5,11 @@ const axs = axios.create({
   mode: "cors",
   withCredentials: true,
   referrer: "https://prime.date/",
-  "X-Remote-IP": "127.0.0.1",
   referrerPolicy: "no-referrer-when-downgrade",
-  headers: { accept: "application/json", "content-type": "application/json" }
+  headers: {
+    accept: "application/json",
+    "content-type": "application/json"
+  }
 });
 
 export const fetchMales = (options, offset, cb, cursor = "") => {
@@ -50,9 +52,10 @@ export const fetchAllMales = (page, filters, cb) => {
 };
 
 export const fetchFemaleData = cb =>
-  axs({ url: "/operator/find-females", method: "POST" }).then(data =>
-    cb(data.data.data.list[0])
-  );
+  axs({ url: "/operator/find-females", method: "POST" }).then(data => {
+    cb(data.data.data.list[0]);
+    console.log("data :", data);
+  });
 
 export const sendMessage = (idMale, idFemale, message, cb) => {
   const data = {
@@ -185,7 +188,8 @@ export const sendAttach = (idMale, idFemale, attachId, type) => {
 
 export const getDataDictionary = cb =>
   axs({
-    url: "https://api.prime.date/system/dictionary?dictionary=3,4,5,6,7,8,9,17",
+    url:
+      "https://api.prime.date/system/dictionary?dictionary=3,4,5,6,7,8,9,17,2",
     method: "GET"
   }).then(data => cb(data.data.data));
 
@@ -201,3 +205,30 @@ export const setOffline = id =>
     data: { userIds: [id], state: 2 },
     method: "POST"
   });
+
+export const login = (email, password) =>
+  axs({
+    url: "https://api.prime.date/auth/login",
+    data: { email: email.trim(), password: password },
+    method: "POST"
+  });
+
+export const logout = () =>
+  axs({
+    url: "https://api.prime.date/auth/logout",
+    method: "POST"
+  });
+
+export const saveMailMedia = (modelId, type) =>
+  axs({
+    url: "https://api.prime.date/upload/save-mail-media-gallery",
+    data: { idUser: modelId, type: type },
+    method: "POST"
+  });
+
+export const getHistory = (idMale, idFemale, last, cb) =>
+  axs({
+    url: "https://api.prime.date/operator/history",
+    data: { uid: `${idMale}_${idFemale}`, last: last, limit: 5 },
+    method: "POST"
+  }).then(cb => cb.data);

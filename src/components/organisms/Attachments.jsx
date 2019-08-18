@@ -67,34 +67,43 @@ class Stickers extends Component {
   }
 
   render() {
+    console.log("this.state.video", this.state.video);
     return (
       <React.Fragment>
         <Modal gallery w="600px" h="800px" bg="#efefef">
           <TabsWrapper>
-            <Tab
-              onClick={() => this.renderContent("stickers")}
-              red={this.state.showStickers}
-            >
-              Stickers
-            </Tab>
-            <Tab
-              onClick={() => this.renderContent("images")}
-              red={this.state.showImages}
-            >
-              Photo
-            </Tab>
-            <Tab
-              onClick={() => this.renderContent("video")}
-              red={this.state.showVideo}
-            >
-              Video
-            </Tab>
-            <Tab
-              onClick={() => this.renderContent("audio")}
-              red={this.state.showAudio}
-            >
-              Audio
-            </Tab>
+            {!!this.props.stickersTab && (
+              <Tab
+                onClick={() => this.renderContent("stickers")}
+                red={this.state.showStickers}
+              >
+                Stickers
+              </Tab>
+            )}
+            {!!this.props.photo && (
+              <Tab
+                onClick={() => this.renderContent("images")}
+                red={this.state.showImages}
+              >
+                Photo
+              </Tab>
+            )}
+            {!!this.props.video && (
+              <Tab
+                onClick={() => this.renderContent("video")}
+                red={this.state.showVideo}
+              >
+                Video
+              </Tab>
+            )}
+            {!!this.props.audio && (
+              <Tab
+                onClick={() => this.renderContent("audio")}
+                red={this.state.showAudio}
+              >
+                Audio
+              </Tab>
+            )}
           </TabsWrapper>
           {this.state.showStickers &&
             this.props.stickers.map(category =>
@@ -105,27 +114,54 @@ class Stickers extends Component {
                 />
               ))
             )}
-          {this.state.showAudio &&
-            this.state.audio.map(audio => (
-              <AttachIconLabel>
-                {audio.title}
-                <AttachIcon
-                  lg
-                  src={
-                    "http://www.myiconfinder.com/uploads/iconsets/256-256-7fcc2234bf1ab89f98287243830b9415-itunes.png"
-                  }
-                  onClick={() => this.addToAttachment(audio, "audio")}
-                />
-              </AttachIconLabel>
-            ))}
-          {this.state.showVideo &&
-            this.state.video.map(video => (
-              <AttachIcon
-                lg
-                src={video.url_thumbnail}
-                onClick={() => this.addToAttachment(video, "video")}
-              />
-            ))}
+          {this.state.showAudio
+            ? this.props.moderation
+              ? this.state.audio
+                  .filter(aud => aud.id_status === 4)
+                  .map(audio => (
+                    <AttachIconLabel>
+                      {audio.title}
+                      <AttachIcon
+                        lg
+                        src={
+                          "http://www.myiconfinder.com/uploads/iconsets/256-256-7fcc2234bf1ab89f98287243830b9415-itunes.png"
+                        }
+                        onClick={() => this.addToAttachment(audio, "audio")}
+                      />
+                    </AttachIconLabel>
+                  ))
+              : this.state.audio.map(audio => (
+                  <AttachIconLabel>
+                    {audio.title}
+                    <AttachIcon
+                      lg
+                      src={
+                        "http://www.myiconfinder.com/uploads/iconsets/256-256-7fcc2234bf1ab89f98287243830b9415-itunes.png"
+                      }
+                      onClick={() => this.addToAttachment(audio, "audio")}
+                    />
+                  </AttachIconLabel>
+                ))
+            : null}
+          {this.state.showVideo
+            ? this.props.moderation
+              ? this.state.video
+                  .filter(vid => vid.id_status === 1)
+                  .map(video => (
+                    <AttachIcon
+                      lg
+                      src={video.url_thumbnail}
+                      onClick={() => this.addToAttachment(video, "video")}
+                    />
+                  ))
+              : this.state.video.map(video => (
+                  <AttachIcon
+                    lg
+                    src={video.url_thumbnail}
+                    onClick={() => this.addToAttachment(video, "video")}
+                  />
+                ))
+            : null}
           {this.state.showImages &&
             this.state.images.map(image => (
               <AttachIcon

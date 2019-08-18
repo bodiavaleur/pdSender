@@ -11,6 +11,14 @@ export const Modal = styled.div`
   margin: 15px;
   position: relative;
 
+  ${({ center }) =>
+    center &&
+    `
+    justify-content: center;
+    align-items: center;
+  `}
+
+
   ${({ profile }) =>
     profile &&
     `

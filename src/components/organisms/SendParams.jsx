@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { Modal, Shade, Input } from "../../ui/atoms";
-import Select from "react-select";
 import { ParamLabelBlock, ParamLabel, ParamsWrap } from "../../ui/molecules";
-import { getDataDictionary } from "../../api";
 import { Spring } from "react-spring/renderprops";
 
 export default class SendParams extends Component {
@@ -57,6 +55,7 @@ export default class SendParams extends Component {
                   </div>
                 </ParamLabelBlock>
                 {this.selectOpt(0, "countries", "Country")}
+                {this.selectOpt(8, "lastOnline", "Last Online")}
                 {this.selectOpt(3, "education", "Education")}
                 {this.selectOpt(2, "marital_status", "Status")}
                 {this.selectOpt(7, "countChildren", "Children")}

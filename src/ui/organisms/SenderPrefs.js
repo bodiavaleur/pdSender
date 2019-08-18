@@ -10,7 +10,7 @@ export const SenderPrefs = styled.div`
   margin: auto;
 
   input:checked + label {
-    background-color: rgb(255, 69, 58);
+    background-color: rgb(0, 122, 255);
     color: white;
     opacity: 1;
   }
