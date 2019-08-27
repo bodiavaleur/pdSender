@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import { Modal, Shade, Input } from "../../ui/atoms";
 import { ParamLabelBlock, ParamLabel, ParamsWrap } from "../../ui/molecules";
 import { Spring } from "react-spring/renderprops";
-
-export default class SendParams extends Component {
+import { connect } from "react-redux";
+class SendParams extends Component {
   constructor(props) {
     super(props);
 
@@ -18,6 +18,7 @@ export default class SendParams extends Component {
           name={name}
           onChange={this.props.setParam}
           style={{ width: "125px" }}
+          value={this.props.searchFilters[name]}
         >
           {this.props.dataDictionary[idx].dictionary.map(data => (
             <option key={data.id} value={data.id}>
@@ -30,6 +31,8 @@ export default class SendParams extends Component {
   }
 
   render() {
+    console.log("this.props.searchFilters", this.props.searchFilters);
+    console.log("this.props.dataDictionary", this.props.dataDictionary);
     return (
       <React.Fragment>
         <Spring from={{ right: "-400px" }} to={{ right: "-15px" }}>
@@ -90,3 +93,9 @@ export default class SendParams extends Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  searchFilters: state.pdReducer.searchFilters
+});
+
+export default connect(mapStateToProps)(SendParams);

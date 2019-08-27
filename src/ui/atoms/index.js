@@ -1,4 +1,4 @@
-export { Modal, ModalGroup } from "./Modal";
+export { Modal, ModalGroup, ModalOverlay } from "./Modal";
 export { ProfileBackground } from "./ProfileBackground";
 export { ProfileAvatar, ProfileText } from "./Profile";
 export { ArrowButton } from "./ArrowButton";
@@ -20,7 +20,7 @@ export { DisplayMessages } from "./DisplayMessages";
 export { AttachIcon, AttachIconLabel } from "./AttachIcon";
 export { Line } from "./Line";
 export { IconButton } from "./IconButton";
-export { Button } from "./Button";
+export { Button, ButtonLabel } from "./Button";
 export { Logo } from "./Logo";
 export { FlexContainer } from "./FlexContainer";
 export { UserText, UserWrapper } from "./User";

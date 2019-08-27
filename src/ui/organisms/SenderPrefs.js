@@ -9,14 +9,16 @@ export const SenderPrefs = styled.div`
   flex-flow: row wrap;
   margin: auto;
 
+  ${({ parse }) =>
+    parse &&
+    `
+    width: auto;
+  `}
+
   input:checked + label {
     background-color: rgb(0, 122, 255);
     color: white;
     opacity: 1;
-  }
-
-  input[type="radio"] {
-    display: none;
   }
 `;
 
@@ -54,15 +56,17 @@ export const PrefGroup = styled.div`
 export const PrefItem = styled.label`
   width: 45px;
   height: 45px;
-  background: rgba(255, 255, 255, 0.5);
+  background: #626365;
+  opacity: 0.8;
+  color: #bcbcbd;
   border-radius: 100%;
-  color: rgba(0, 0, 0, 0.5);
   margin: 5px;
   font-size: 1.35rem;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  transition: transform 0.3s ease;
 
   ${({ inset }) =>
     inset &&
@@ -70,6 +74,12 @@ export const PrefItem = styled.label`
     position: absolute;
     bottom: 1%;
     right: 1%;
+  `}
+  
+  ${({ stop }) =>
+    stop &&
+    `
+    z-index: 12;
   `}
 
   ${({ cubical }) =>
@@ -79,6 +89,11 @@ export const PrefItem = styled.label`
     margin: 0 10px;
     width: 50px;
     height: 50px;
-    background: rgba(255,255,255, 0.5);
+    background: linear-gradient(0deg, rgba(50,50,50,0.5) 0%, rgba(65,65,65,0.5) 100%);
+  box-shadow: 2px 2px 6px 2px rgba(0,0,0, 0.3);
   `}
+
+  &:active {
+    transform: scale(1.2);
+  }
 `;

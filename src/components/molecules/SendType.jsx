@@ -24,6 +24,7 @@ class SendType extends Component {
           name="sendType"
           id="chat"
           value="chat"
+          checked={this.props.sendType === "chat"}
           onChange={this.senderType}
         />
         <PrefItem htmlFor="chat">
@@ -35,6 +36,7 @@ class SendType extends Component {
           name="sendType"
           id="mail"
           value="mail"
+          checked={this.props.sendType === "mail"}
           onChange={this.senderType}
         />
         <PrefItem htmlFor="mail">
@@ -45,4 +47,8 @@ class SendType extends Component {
   }
 }
 
-export default connect()(SendType);
+const mapStateToProps = state => ({
+  sendType: state.pdReducer.sendType
+});
+
+export default connect(mapStateToProps)(SendType);

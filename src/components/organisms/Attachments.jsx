@@ -43,6 +43,8 @@ class Stickers extends Component {
       case "images":
         contentType.showImages = true;
         break;
+      default:
+        return;
     }
     return this.setState(contentType);
   }

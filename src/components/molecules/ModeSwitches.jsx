@@ -98,7 +98,7 @@ class ModeSwitches extends Component {
             onChange={this.toggleOnline()}
           >
             <span className="fas fa-signal" />
-            <input type="checkbox" />
+            <input type="checkbox" checked={this.props.useOnline} />
             <i />
           </label>
           <label
@@ -108,16 +108,21 @@ class ModeSwitches extends Component {
             style={{ opacity: this.props.mode === "bmAll" ? 0.5 : 1 }}
           >
             <span className="fas fa-user-slash" />
-            <input type="checkbox" disabled={this.props.mode === "bmAll"} />
+            <input
+              type="checkbox"
+              disabled={this.props.mode === "bmAll"}
+              checked={this.props.ignoreBm}
+            />
             <i />
           </label>
           <label
             id="switchRepeat"
             className="form-switch f-sm"
             onChange={this.toggleUseRepeat}
+            style={{ opacity: this.props.mode === "listing" ? 0.5 : 1 }}
           >
             <span className="fas fa-redo-alt" />
-            <input type="checkbox" />
+            <input type="checkbox" checked={this.props.useRepeat} />
             <i />
           </label>
           <label
@@ -126,7 +131,7 @@ class ModeSwitches extends Component {
             onChange={this.toggleSetOffline}
           >
             <span className="fas fa-eye-slash" />
-            <input type="checkbox" />
+            <input type="checkbox" checked={this.props.setOffline} />
             <i />
           </label>
           <label
@@ -135,7 +140,7 @@ class ModeSwitches extends Component {
             onChange={this.toggleAutoMpm}
           >
             <span className="fas fa-robot" />
-            <input type="checkbox" />
+            <input type="checkbox" checked={this.props.autoMpm} />
             <i />
           </label>
         </Modal>
@@ -179,7 +184,11 @@ const mapStateToProps = state => ({
   mode: state.pdReducer.mode,
   likeUser: state.pdReducer.likeUser,
   favUser: state.pdReducer.favUser,
-  autoMpm: state.pdReducer.autoMpm
+  autoMpm: state.pdReducer.autoMpm,
+  setOffline: state.pdReducer.setOffline,
+  useRepeat: state.pdReducer.useRepeat,
+  ignoreBm: state.pdReducer.ignoreBm,
+  useOnline: state.pdReducer.useOnline
 });
 
 export default connect(mapStateToProps)(ModeSwitches);

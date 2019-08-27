@@ -6,7 +6,7 @@ export const NotWorkingWrapper = styled.div`
   justify-content: center;
   align-content: center;
   flex-direction: column;
-  background: white;
+  background: rgba(255, 255, 255, 0.7);
   position: absolute;
   z-index: 9999;
   text-align: center;
@@ -22,13 +22,18 @@ export const BlockSign = styled.span`
 
 export const BlockText = styled.span`
   font-size: ${props => props.size + "rem"};
-  color: rgb(44, 44, 46);
+  color: rgba(255, 255, 255, 0.5);
   line-height: 2rem;
+  cursor: default;
 
   ${({ bold }) =>
     bold &&
     `
+    display: flex;
+    width: 230px;
+    justify-content: space-around;
     font-weight: 600;
-    margin: 45px 0;
+    margin: 45px auto;
+    align-items: flex-end;
   `}
 `;

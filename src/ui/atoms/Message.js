@@ -9,14 +9,15 @@ export const Message = styled.textarea`
   height: 90%;
   margin: auto 0;
   border: none;
-  color: rgba(72, 72, 74, 1);
+  color: rgba(255, 255, 255, 0.8);
   font-family: "SF Display", Arial, Helvetica, sans-serif;
   font-weight: 600;
   line-height: 1.3rem;
   overflow-y: scroll;
+  scrollbar-width: none
 
   ::placeholder {
-    color: rgba(0, 0, 0, 0.35);
+    color: rgba(255, 255, 255, 0.2);
   }
 
   ::-webkit-scrollbar {
@@ -28,8 +29,8 @@ export const Message = styled.textarea`
     `
     width: 75px;
     height: 100px;
-    background: rgba(242, 242, 247, 1);
+    background: linear-gradient(0deg, rgba(89,89,89,1) 0%, rgba(118,118,118,1) 100%);
     width: 90%;
-    height: 90%;
+    height: 85%;
   `}
 `;

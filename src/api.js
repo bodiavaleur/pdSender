@@ -4,11 +4,11 @@ const axs = axios.create({
   baseURL: "https://api.prime.date",
   mode: "cors",
   withCredentials: true,
+  crossdomain: true,
   referrer: "https://prime.date/",
   referrerPolicy: "no-referrer-when-downgrade",
   headers: {
-    accept: "application/json",
-    "content-type": "application/json"
+    Accept: "application/json"
   }
 });
 
@@ -53,8 +53,7 @@ export const fetchAllMales = (page, filters, cb) => {
 
 export const fetchFemaleData = cb =>
   axs({ url: "/operator/find-females", method: "POST" }).then(data => {
-    cb(data.data.data.list[0]);
-    console.log("data :", data);
+    cb(data.data.data.list);
   });
 
 export const sendMessage = (idMale, idFemale, message, cb) => {
@@ -136,11 +135,7 @@ export const getBonuses = cb => {
   };
 
   axs({
-    url: `/statistic/operator?dateFrom=${todayDate.year}-${todayDate.month}-${
-      todayDate.day
-    }&dateTo=${tomorrowDate.year}-${tomorrowDate.month}-${
-      tomorrowDate.day
-    }&groupByDate=0`,
+    url: `/statistic/operator?dateFrom=${todayDate.year}-${todayDate.month}-${todayDate.day}&dateTo=${tomorrowDate.year}-${tomorrowDate.month}-${tomorrowDate.day}&groupByDate=0`,
     method: "GET"
   }).then(res => {
     let bonuses = res.data.data[0] ? res.data.data[0].bonuses : 0;
@@ -188,47 +183,106 @@ export const sendAttach = (idMale, idFemale, attachId, type) => {
 
 export const getDataDictionary = cb =>
   axs({
-    url:
-      "https://api.prime.date/system/dictionary?dictionary=3,4,5,6,7,8,9,17,2",
+    url: "/system/dictionary?dictionary=3,4,5,6,7,8,9,17,2",
     method: "GET"
   }).then(data => cb(data.data.data));
 
 export const getMale = (id, cb) =>
   axs({
-    url: `https://api.prime.date/operator/get-male/${id}`,
+    url: `/operator/get-male/${id}`,
     method: "POST"
   }).then(data => cb(data.data.data));
 
 export const setOffline = id =>
   axs({
-    url: "https://api.prime.date/female/online",
+    url: "/female/online",
     data: { userIds: [id], state: 2 },
     method: "POST"
   });
 
 export const login = (email, password) =>
   axs({
-    url: "https://api.prime.date/auth/login",
+    url: "/auth/login",
     data: { email: email.trim(), password: password },
     method: "POST"
   });
 
 export const logout = () =>
   axs({
-    url: "https://api.prime.date/auth/logout",
+    url: "/auth/logout",
     method: "POST"
   });
 
 export const saveMailMedia = (modelId, type) =>
   axs({
-    url: "https://api.prime.date/upload/save-mail-media-gallery",
+    url: "/upload/save-mail-media-gallery",
     data: { idUser: modelId, type: type },
     method: "POST"
   });
 
-export const getHistory = (idMale, idFemale, last, cb) =>
+export const getConnections = (uid, cb) =>
   axs({
-    url: "https://api.prime.date/operator/history",
-    data: { uid: `${idMale}_${idFemale}`, last: last, limit: 5 },
+    url: "/connections/get",
+    data: { criteria: { uids: [uid] }, type: "uids" },
     method: "POST"
-  }).then(cb => cb.data);
+  });
+
+export const createConnection = (idMale, idFemale, cb) =>
+  axs({
+    url: "/connections/create",
+    data: { idMale: idMale, idFemale: idFemale },
+    method: "POST"
+  }).then(data => cb(data.data.data.connection));
+
+// export const getHistory = (idMale, idFemale, last, cb, reversed=false) => {
+// .then(historyData =>
+//     reversed &&
+//     axs({
+//       url: "https://api.prime.date/operator/history",
+//       data: {
+//         uid: historyData.data.data.connections[0].uid,
+//         last: last
+//           ? last
+//           : historyData.data.data.connections[0].chat.history[0].id,
+//         limit: 200
+//       },
+//       method: "POST"
+//     }).then(data => cb(data.data.data))
+//   );
+// };
+
+// export const saveToGallery = (idFemale, file, formData) => {
+//   const data = new FormData();
+//   data.append("key", formData.key);
+//   data.append("acl", formData.acl);
+//   data.append("Content-Type", "video/mp4");
+//   data.append("success_action_status", formData.success_action_status);
+//   data.append("x-amz-meta-id_user", formData["x-amz-meta-id_user"]);
+//   data.append("x-amz-meta-handler", formData["x-amz-meta-handler"]);
+//   data.append("x-amz-meta-uuid", formData["x-amz-meta-uuid"]);
+//   data.append("x-amz-meta-type", formData["x-amz-meta-type"]);
+//   data.append("x-amz-meta-env-domain", formData["x-amz-meta-env-domain"]);
+//   data.append("X-Amz-Credential", formData["X-Amz-Credential"]);
+//   data.append("X-Amz-Algorithm", formData["X-Amz-Algorithm"]);
+//   data.append("X-Amz-Date", formData["X-Amz-Date"]);
+//   data.append("Policy", formData["Policy"]);
+//   data.append("X-Amz-Signature", formData["X-Amz-Signature"]);
+//   data.append("x-amz-meta-id_mirrors", "m");
+//   data.append("file", file);
+//   axs({
+//     url: "https://vb-video-input.s3.amazonaws.com/",
+//     data: data,
+//     method: "post"
+//   }).then(res => console.log("res", res));
+// };
+
+// export const saveUploadedMedia = (idFemale, type) => {
+//   const data = { idUser: idFemale, type: type };
+//   data["media"] = type === "audio" ? [{ title: "audio.mp3" }] : null;
+
+//   axs({
+//     url: "https://api.prime.date/upload/save-mail-media-gallery",
+//     data: data,
+//     method: "POST"
+//   });
+// };

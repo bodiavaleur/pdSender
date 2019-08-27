@@ -4,9 +4,11 @@ export const Modal = styled.div`
   display: flex;
   width: ${props => props.w};
   height: ${props => props.h};
-  background: rgba(242, 242, 247, 0.5);
-  border-radius: 15px;
-  box-shadow: 2px 6px 15px rgba(44, 44, 46, 0.8);
+  // background: rgba(242, 242, 247, 0.5);
+  background: rgb(50,50,50);
+  border-radius: 20px;
+  background: linear-gradient(0deg, rgba(50,50,50,0.5) 0%, rgba(65,65,65,0.5) 100%);
+  box-shadow: 2px 2px 6px 2px rgba(0,0,0, 0.3);
   align-items: center;
   margin: 15px;
   position: relative;
@@ -25,7 +27,11 @@ export const Modal = styled.div`
      flex-direction: column;
      justify-content: center;
      align-items: center;
-     margin: auto;
+     margin: 50px;
+     transition: box-shadow 0.2s ease-in, transform 0.3s ease-in;
+     &:active {
+       transform: scale(1.05)
+     }
   `}
 
 ${({ switches }) =>
@@ -34,7 +40,7 @@ ${({ switches }) =>
     flex-direction: column;
     justify-content: space-evenly;
     // color: rgb(99, 99, 102);
-    color: rgba(72, 72, 74, 0.7);
+    color: rgba(255,255,255, 0.5);
     text-align: left;
     position: relative;
 
@@ -70,10 +76,10 @@ ${({ gallery }) =>
     padding: 2px 6px;
     position: absolute;
     z-index: 10;
-    opacity: 0.9;
     top: 10%;
     overflow-y: scroll;
-  background: rgba(242, 242, 247, 0.9);
+    background: linear-gradient(0deg, rgba(50,50,50,1) 0%, rgba(65,65,65,1) 100%);
+    box-shadow: 2px 2px 6px 2px rgba(0,0,0, 0.3);
 
 
     ::-webkit-scrollbar {
@@ -93,7 +99,7 @@ ${({ displayMessage }) =>
   displayMessage &&
   `
   margin: 25px 0;
-  color: rgba(72, 72, 74, 1);
+  color: rgba(255,255,255, 1);
   font-size: 1.2rem;
   font-weight: 500;
   font-family: 'SF Display', Arial;
@@ -115,7 +121,8 @@ ${({ blacklist }) =>
   position: absolute;
   margin: auto 0;
   right: 0;
-  background: rgba(242, 242, 247, 0.9);
+  background: linear-gradient(0deg, rgba(50,50,50,1) 0%, rgba(65,65,65,1) 100%);
+  box-shadow: 2px 2px 6px 2px rgba(0,0,0, 0.3);
   border-radius: 15px 0 0 15px;
 
   z-index: 10;
@@ -134,7 +141,7 @@ ${({ messageBlock }) =>
   margin: 15px;
   cursor: pointer;
   position: relative;
-  color: rgba(72, 72, 74, 1);
+  color: rgba(255,255,255, 1);
   font-family: 'SF Display', Arial;
   height: 50px;
   `}
@@ -148,7 +155,8 @@ ${({ messageBlock }) =>
   position: absolute;
   right: 0;
   z-index: 10;
-  background: rgba(242, 242, 247, 1);
+  background: linear-gradient(0deg, rgba(50,50,50,1) 0%, rgba(65,65,65,1) 100%);
+  box-shadow: 2px 2px 6px 2px rgba(0,0,0, 0.3);
   border-radius: 15px 0 0 15px;
   `}
 
@@ -160,13 +168,23 @@ ${({ messageBlock }) =>
   position: absolute;
   right: 0;
   z-index: 10;
-  background: rgba(242, 242, 247, 0.9);
+  background: linear-gradient(0deg, rgba(50,50,50,1) 0%, rgba(65,65,65,1) 100%);
+  box-shadow: 2px 2px 6px 2px rgba(0,0,0, 0.3);
   border-radius: 15px 0 0 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
   padding-top: 10px;
+  font-family: 'SF Display', Arial;
+  font-weight: bold;
+  color: rgba(255,255,255, 0.5);
+  `}
+
+  ${({ selected }) =>
+    selected &&
+    `
+    box-shadow: 0 0 10px #61dafb, inset 0 0 10px #61dafb;
   `}
 `;
 
@@ -181,4 +199,16 @@ export const ModalGroup = styled.div`
   ::-webkit-scrollbar {
     display: none;
   }
+`;
+
+export const ModalOverlay = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 `;

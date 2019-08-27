@@ -16,7 +16,7 @@ export const ProfileAvatar = styled.div`
 `;
 
 export const ProfileText = styled.span`
-  color: rgba(72, 72, 74, 1);
+  color: rgb(255, 255, 255, 0.5);
   margin: 15px 0;
   font-family: "SF Display", Arial, Helvetica, sans-serif;
 
@@ -24,6 +24,7 @@ export const ProfileText = styled.span`
     title &&
     `
     font-size: 2rem;
+    font-weight: 500;
   `}
   ${({ about }) =>
     about &&
@@ -35,5 +36,7 @@ export const ProfileText = styled.span`
     name &&
     `
     font-size: 1.1rem;
+  
+
   `};
 `;

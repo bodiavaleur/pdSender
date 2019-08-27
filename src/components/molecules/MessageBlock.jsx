@@ -60,7 +60,9 @@ class MessabeBlock extends Component {
         {this.props.msg}
         {this.state.showOverlay &&
           (this.state.clearAttachment ? (
-            <BlockOverlay onClick={this.removeAttach}>REMOVE</BlockOverlay>
+            <BlockOverlay onClick={this.removeAttach}>
+              <i className="far fa-trash-alt" />
+            </BlockOverlay>
           ) : (
             <BlockOverlay onClick={this.toggleStickers}>
               <i class="fas fa-plus" />
@@ -69,7 +71,9 @@ class MessabeBlock extends Component {
         {!!this.props.attachments.length &&
           this.props.attachments.map(
             el =>
-              el.attachTo === this.props.msg && <AttachIcon xs src={el.image} />
+              el.attachTo === this.props.msg && (
+                <AttachIcon xs src={el.image || el.url_thumbnail} />
+              )
           )}
       </Modal>
     );

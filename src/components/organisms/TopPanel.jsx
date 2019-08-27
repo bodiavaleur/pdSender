@@ -9,8 +9,7 @@ import {
   UserText,
   ProfileAvatar,
   UserWrapper,
-  Button,
-  Line
+  Button
 } from "../../ui/atoms";
 import {
   TOGGLE_SENDER_PAGE,
@@ -45,11 +44,9 @@ class TopPanel extends Component {
       <React.Fragment>
         <Spring
           from={{
-            position: "absolute",
-            top: "-50px"
+            top: "-64px"
           }}
           to={{
-            position: "absolute",
             top: "0"
           }}
         >

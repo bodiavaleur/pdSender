@@ -5,7 +5,7 @@ export const Line = styled.hr`
     horizontal &&
     `
     position: absolute;
-    background: black;
+    background: white;
     width: 80%;
     top: 39%;
     opacity: 0.1;

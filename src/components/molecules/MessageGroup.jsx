@@ -1,15 +1,8 @@
 import React, { Component } from "react";
-import {
-  Modal,
-  Message,
-  GalleryImage,
-  TextInfo,
-  ModalGroup
-} from "../../ui/atoms";
+import { Modal, Message, TextInfo } from "../../ui/atoms";
 
 import { SET_MESSAGE } from "../../redux/actions";
 import { PrefGroup, PrefItem } from "../../ui/organisms";
-import MessageBlock from "./MessageBlock";
 import { connect } from "react-redux";
 
 class MessageGroup extends Component {

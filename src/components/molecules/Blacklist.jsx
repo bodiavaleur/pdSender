@@ -12,7 +12,6 @@ import { SET_BLACKLIST, DEL_BLACKLIST } from "../../redux/actions";
 import { PrefItem, PrefGroup } from "../../ui/organisms";
 import { Spring } from "react-spring/renderprops";
 import { getMale } from "../../api";
-import firebaseConfig from "../../firebase/firebaseConfig";
 
 class Blacklist extends Component {
   constructor(props) {
@@ -35,9 +34,13 @@ class Blacklist extends Component {
 
   addToBlacklist(id) {
     return async () => {
-      await this.props.dispatch({ type: SET_BLACKLIST, payload: id });
+      id = parseInt(id);
+      await this.props.dispatch({
+        type: SET_BLACKLIST,
+        payload: [...this.props.blacklist, id]
+      });
       this.getBlacklistProfile([id]);
-      return localStorage.setItem("blacklist", this.props.blacklist);
+      this.props.addBmFn(id);
     };
   }
 
@@ -47,11 +50,11 @@ class Blacklist extends Component {
       this.setState({
         blacklist: this.state.blacklist.filter(x => x.id !== id)
       });
-      return localStorage.setItem("blacklist", this.props.blacklist);
+      this.props.removeBmFn(id);
     };
   }
 
-  getBlacklistProfile(data, remove = false) {
+  getBlacklistProfile(data) {
     data.map(male =>
       getMale(male, data =>
         this.setState({ blacklist: [...this.state.blacklist, data] })
@@ -60,6 +63,7 @@ class Blacklist extends Component {
   }
 
   componentDidMount() {
+    console.log("this.props.blacklist", this.props.blacklist);
     this.getBlacklistProfile(this.props.blacklist);
   }
 
@@ -103,7 +107,9 @@ class Blacklist extends Component {
 
 const mapStateToProps = state => ({
   blacklist: state.pdReducer.blacklist,
-  showBlacklist: state.uiReducer.showBlacklist
+  showBlacklist: state.uiReducer.showBlacklist,
+  addBmFn: state.pdReducer.addBmFn,
+  removeBmFn: state.pdReducer.removeBmFn
 });
 
 export default connect(mapStateToProps)(Blacklist);

@@ -6,8 +6,6 @@ export const DisplayMessages = styled.div`
   top: 0;
   bottom: 0;
   left: 5%;
-  height: 600px;
-  width: 400px;
   padding: 20px;
   margin: auto 0;
   z-index: 11;

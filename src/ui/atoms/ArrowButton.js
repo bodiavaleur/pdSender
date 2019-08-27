@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const ArrowButton = styled.button`
   font-size: 2rem;
-  color: rgba(72, 72, 74, 0.7);
+  color: rgba(255, 255, 255, 0.5);
   top: 5px;
   border: none;
   background: none;

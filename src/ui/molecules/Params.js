@@ -12,12 +12,11 @@ export const ParamsWrap = styled.div`
 `;
 
 export const ParamLabelBlock = styled.div`
-  border: 1px solid rgba(72, 72, 74, 0.3);
-  border-radius: 15px;
   position: relative;
   background: none;
   padding: 10px;
   font-family: "SF Display", Arial;
+  text-align: center;
 
   select {
     font-size: 0.9rem;
@@ -47,13 +46,20 @@ export const ParamLabelBlock = styled.div`
 export const ParamLabel = styled.label`
   position: absolute;
   top: -7px;
-  left: 15px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
   font-size: 0.7rem;
-  color: white;
-  background: rgba(242, 242, 247, 1);
+  background: none;
   padding: 0 10px;
-  color: rgb(142, 142, 147);
+  color: rgba(255, 255, 255, 0.5);
   font-family: "SF Display", Arial;
+
+  ${({ moderation }) =>
+    moderation &&
+    `
+    right: auto;
+  `}
 
   ${({ login }) =>
     login &&

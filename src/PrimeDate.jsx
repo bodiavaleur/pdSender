@@ -1,4 +1,4 @@
-import { fetchFemaleData, getBonuses, getLimit, login, logout } from "./api";
+import { fetchFemaleData, getBonuses, login, logout } from "./api";
 import Iframe from "react-iframe";
 import React, { Component } from "react";
 import ProfilePage from "./components/pages/ProfilePage";
@@ -8,7 +8,15 @@ import MagicPage from "./components/pages/MagicPage";
 import { UseGlobalStyle } from "./ui/pages/UseGlobalStyle";
 import "./ui/pages/resets.css";
 import { connect } from "react-redux";
-import { SET_FEMALE_DATA, SET_BONUSES, SET_USER_DATA } from "./redux/actions";
+import {
+  SET_FEMALE_DATA,
+  SET_BONUSES,
+  SET_BLACKLIST,
+  SET_ADD_BM_FN,
+  SET_REMOVE_BM_FN,
+  SET_GET_BM_FN,
+  SET_REG_FN
+} from "./redux/actions";
 import {
   ArrowButton,
   TextInfoCredits,
@@ -29,7 +37,7 @@ import {
 } from "react-router-dom";
 import { HeartSpinner } from "react-spinners-kit";
 import withFirebaseAuth from "react-with-firebase-auth";
-import * as firebase from "firebase/app";
+import * as firebase from "firebase";
 import "firebase/auth";
 import firebaseConfig from "./firebase/firebaseConfig";
 import PrivateRoute from "./components/atoms/PrivateRoute";
@@ -48,7 +56,13 @@ class PrimeDate extends Component {
     this.state = {
       email: "",
       password: "",
-      loggedIn: false
+      loggedIn: false,
+      error: false,
+      idxBlocked: null,
+      audio50: document.getElementById("audio50"),
+      audio10: document.getElementById("audio10"),
+      audio5: document.getElementById("audio5"),
+      audio2: document.getElementById("audio2")
     };
 
     this.toggleTopPanel = this.toggleTopPanel.bind(this);
@@ -56,13 +70,10 @@ class PrimeDate extends Component {
     this.authUser = this.authUser.bind(this);
     this.handleLoginChange = this.handleLoginChange.bind(this);
     this.userLogout = this.userLogout.bind(this);
-
-    this.state = {
-      audio50: document.getElementById("audio50"),
-      audio10: document.getElementById("audio10"),
-      audio5: document.getElementById("audio5"),
-      audio2: document.getElementById("audio2")
-    };
+    this.addBmToDatabase = this.addBmToDatabase.bind(this);
+    this.removeBmFromDatabase = this.removeBmFromDatabase.bind(this);
+    this.getBlacklist = this.getBlacklist.bind(this);
+    this.isRegistered = this.isRegistered.bind(this);
   }
 
   toggleTopPanel() {
@@ -106,17 +117,14 @@ class PrimeDate extends Component {
     return async () => {
       await this.props.signInWithEmailAndPassword(email, password);
 
-      sessionStorage.setItem("email", email);
-      sessionStorage.setItem("password", password);
+      await localStorage.setItem("email", email);
+      await localStorage.setItem("password", password);
 
-      await login(email, password);
+      // await login(email, password);
 
-      await fetchFemaleData(model =>
-        this.props.dispatch({ type: SET_FEMALE_DATA, payload: model })
-      );
-
-      await setInterval(() => this.countBonuses(true), 10000);
       this.setState({ loggedIn: true });
+
+      setInterval(() => this.countBonuses(true), 10000);
     };
   }
 
@@ -124,44 +132,135 @@ class PrimeDate extends Component {
     return async () => {
       await firebase.auth().signOut();
       logout();
-      sessionStorage.setItem("email", null);
-      sessionStorage.setItem("password", null);
+      localStorage.setItem("email", null);
+      localStorage.setItem("password", null);
       this.setState({ loggedIn: false });
+      document.location.assign(process.env.PUBLIC_URL);
     };
   }
 
+  isRegistered(idx) {
+    const checkRegistered = cb =>
+      firebase
+        .database()
+        .ref("/modelsArray/")
+        .once("value")
+        .then(snapshot => {
+          console.log("object", snapshot.val().array);
+          console.log(
+            "array.includes(model.id)",
+            snapshot.val().array.includes(31596719)
+          );
+          cb(snapshot.val().array);
+        });
+    fetchFemaleData(modelList => {
+      const model = modelList[idx];
+      checkRegistered(array => {
+        if (array.includes(model.id)) {
+          this.props.dispatch({ type: SET_FEMALE_DATA, payload: model });
+          this.getBlacklist(model.id, snap => {
+            this.props.dispatch({ type: SET_BLACKLIST, payload: snap });
+          });
+          this.props.dispatch({
+            type: SET_ADD_BM_FN,
+            payload: this.addBmToDatabase
+          });
+          this.props.dispatch({
+            type: SET_REMOVE_BM_FN,
+            payload: this.removeBmFromDatabase
+          });
+          this.setState({ loggedIn: true });
+        } else {
+          this.props.dispatch({ type: SET_FEMALE_DATA, payload: [] });
+          this.setState({ loggedIn: false });
+          this.userLogout();
+        }
+      });
+    });
+  }
+
+  getBlacklist(modelId, cb) {
+    firebase
+      .database()
+      .ref("/blacklist/" + modelId)
+      .once("value")
+      .then(snapshot => {
+        if (snapshot.val()) {
+          cb(Object.values(snapshot.val()).map(el => parseInt(el)));
+        } else {
+          firebase
+            .database()
+            .ref("/blacklist/" + this.props.modelData.id)
+            .push([]);
+        }
+      });
+  }
+
+  addBmToDatabase(id) {
+    firebase
+      .database()
+      .ref("/blacklist/" + this.props.modelData.id)
+      .push(parseInt(id));
+  }
+
+  removeBmFromDatabase(id) {
+    firebase
+      .database()
+      .ref("/blacklist/" + this.props.modelData.id)
+      .once("value")
+      .then(snapshot => {
+        console.log(
+          `/blacklist/${this.props.modelData.id}/${Object.keys(
+            snapshot.val()
+          ).find(key => snapshot.val()[key] === id)}`,
+          snapshot.val()
+        );
+        firebase
+          .database()
+          .ref(
+            `/blacklist/${this.props.modelData.id}/${Object.keys(
+              snapshot.val()
+            ).find(key => snapshot.val()[key] === id)}`
+          )
+          .remove();
+      });
+  }
+
   componentDidMount() {
-    const savedEmail = sessionStorage.getItem("email");
-    const savedPwd = sessionStorage.getItem("password");
+    const savedEmail = localStorage.getItem("email");
+    const savedPwd = localStorage.getItem("password");
 
     if (savedEmail && savedPwd) {
-      login(savedEmail, savedPwd);
+      // login(savedEmail, savedPwd);
       this.authUser(savedEmail, savedPwd)();
     } else {
       logout();
     }
+
+    this.props.dispatch({ type: SET_REG_FN, payload: this.isRegistered });
   }
 
   render() {
     const isLoggedIn = !!firebase.auth().currentUser;
-    console.log("isLoggedIn :", isLoggedIn);
     document.title = `Sender | ${this.props.currentBonuses}`;
     return (
       <Router>
         <UseGlobalStyle />
 
-        {!!this.props.user &&
-          (this.props.showTopPanel ? (
-            <TopPanel
-              user={this.props.user}
-              userLogout={this.userLogout()}
-              toggleTopPanel={this.toggleTopPanel}
-            />
-          ) : (
-            <ArrowButton onClick={this.toggleTopPanel}>
-              <i className="fas fa-chevron-down" />
-            </ArrowButton>
-          ))}
+        {!!this.props.user && this.props.showTopPanel && (
+          <TopPanel
+            user={this.props.user}
+            userLogout={this.userLogout()}
+            toggleTopPanel={this.toggleTopPanel}
+          />
+        )}
+
+        <ArrowButton
+          onClick={this.toggleTopPanel}
+          style={{ visibility: this.props.showTopPanel ? "hidden" : "visible" }}
+        >
+          <i className="fas fa-chevron-down" />
+        </ArrowButton>
 
         <Iframe
           key="pdIframe"
@@ -171,10 +270,6 @@ class PrimeDate extends Component {
           height="0"
           display="none"
         />
-
-        {!!this.props.modelData.length && (
-          <Redirect to={process.env.PUBLIC_URL + "/error"} />
-        )}
 
         <Switch>
           <PrivateRoute
@@ -205,17 +300,23 @@ class PrimeDate extends Component {
           <Route
             exact
             path={process.env.PUBLIC_URL + "/error"}
-            component={NotWorking}
+            render={() => <NotWorking logout={this.userLogout()} />}
           />
         </Switch>
 
         {isLoggedIn ? (
-          <Redirect to={process.env.PUBLIC_URL + "/profile"} />
+          !this.state.loggedIn ? (
+            <Redirect to={process.env.PUBLIC_URL + "/error"} />
+          ) : (
+            <Redirect to={process.env.PUBLIC_URL + "/profile"} />
+          )
         ) : (
-          <PageWrapper>
-            <ProfileBackground img="https://www.gizdev.com/wp-content/uploads/2018/11/MacBook-Air-2018-Stock-Walls-2.jpg" />
-            <Logo color="white">Sender</Logo>
-            <InputGroup>
+          <PageWrapper className="text-focus-in">
+            <ProfileBackground img="https://lh3.googleusercontent.com/67QkZk4pJIAL7tH2EcXK1iKLG-44PFs4bJn-Pt0xPxCBt8ooQhorqqNYoNojy04MaQBRyKt_DMCV6eA2PbDfPVt0NLBSDbqZABArHcNt0YhhZcUP0SoZrk-PfdTD6GBieizIliMVDNJNeOUk0nb15qIWx2_3rBnVwgtrwrnENq7W_obrcJKTGNCni_gg8mHtKiLhScsWsDJxV00xdKq8hbKkaFpTLHsUG3bwjnbr1X03UeQGa0nZhvcvXKgoPvp0z9ejhHd_M4DoJfht62RiAkXudNpvAvmwGY-USltQQh8M79CMtU7LVYT5eDH8X7gehV9p7374JqwSwmZwxdobWK3xLchhkhMo8m9SdDTZ-3odUC0zeno51RHMWw-5qPdx9fXKDsoa7_9LBR9drpVzz_4oPnGroPUrjx_6Bcp5_E4Nt9u-FtsGuJPyg9NdZjtjh1lKhQW_QZA28XZGGJn53PsX3ZsFzi2lZjZ0J6qhZdhYlcCmw-iicwabr5ZOMIHK1e51Y5N3lea71Wguqccsd9E8EzgBmbSFGAHJT4iBD-M8AHI16lfL8kgc9RzW6mCUBq5tBfD8A_nBK7PNTRdyPAf87kp9txicoBbf2xlZi9RkQVXlf7gTSQXnDozs3aLbgnVcD5Rzg4J4w42l9g0oKhR71c6wuNhOO934A8Aur7Au1AbKHkYvVME4lwQe3Qg7pb5sJLTmj-WzPfazfzG6L3l7=w1270-h715-no" />
+            <Logo className="text-focus-in" color="white">
+              Sender
+            </Logo>
+            <InputGroup className="text-focus-in">
               <Input
                 login
                 placeholder="Email"
@@ -230,7 +331,12 @@ class PrimeDate extends Component {
                 onChange={this.handleLoginChange}
               />
             </InputGroup>
-            <Button onClick={this.authUser()}>SIGN IN</Button>
+            <Button className="text-focus-in" onClick={this.authUser()}>
+              SIGN IN
+            </Button>
+            <TextInfoCredits center className="text-focus-in">
+              Copyright © 2019. All rights reserved.
+            </TextInfoCredits>
           </PageWrapper>
         )}
 
@@ -251,7 +357,9 @@ const mapStateToProps = state => ({
   showProfilePage: state.uiReducer.showProfilePage,
   showSenderPage: state.uiReducer.showSenderPage,
   showMailingPage: state.uiReducer.showMailingPage,
-  currentBonuses: state.pdReducer.currentBonuses
+  currentBonuses: state.pdReducer.currentBonuses,
+  addBmFn: state.pdReducer.addBmFn,
+  removeBmFn: state.pdReducer.removeBmFn
 });
 
 export default connect(mapStateToProps)(

@@ -11,6 +11,19 @@ export const ProfilePageWrapper = styled.div`
   width: 100vw;
   height: 100vh;
   align-items: center;
-  
+  flex-direction: column;
+  `}
+
+  ${({ profile }) =>
+    profile &&
+    `
+  flex-flow: row wrap;
+  overflow-y: scroll;
+  width: 100vw;
+  height: 100vh;
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
   `}
 `;

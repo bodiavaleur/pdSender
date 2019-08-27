@@ -1,18 +1,26 @@
 import styled from "styled-components";
 
 export const Input = styled.input`
-  color: rgba(72, 72, 74, 1);
+  color: white;
   width: 150px;
   height: 25px;
   border-radius: 5px;
-  border: 1.5px solid rgba(72, 72, 74, 0.3);
   font-size: 0.7rem;
   text-align: center;
   line-height: 15px;
   font-weight: bold;
-  background: white;
+  border: none;
+  background: linear-gradient(
+    0deg,
+    rgba(89, 89, 89, 1) 0%,
+    rgba(118, 118, 118, 1) 100%
+  );
   margin: 0 auto;
   font-family: "SF Display", Arial, Helvetica, sans-serif;
+
+  ::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
 
   ${({ age }) =>
     age &&
@@ -20,6 +28,8 @@ export const Input = styled.input`
     width: 75px;
     height: 25px;
     margin: 0 5px;
+
+    
   `}
 
   ${({ login }) =>
@@ -31,6 +41,12 @@ export const Input = styled.input`
     ::placeholder {
       color: #aaa;
     }
+  `}
+
+  ${({ file }) =>
+    file &&
+    `
+    display: none;
   `}
 `;
 

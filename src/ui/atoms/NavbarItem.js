@@ -10,7 +10,13 @@ export const NavbarItem = styled.div`
   font-weight: bold;
   margin: 0 20px;
   cursor: pointer;
-  color: rgba(72, 72, 74, 1);
+  color: rgb(255, 255, 255, 0.5);
+
+  ${({ selected }) =>
+    selected &&
+    `
+    color: rgb(0, 122, 255);
+  `}
 `;
 
 export const NavbarItemIcon = styled.div`

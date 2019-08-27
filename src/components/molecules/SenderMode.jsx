@@ -14,6 +14,7 @@ class SenderMode extends Component {
             name="senderMode"
             id="all"
             value="all"
+            checked={this.props.mode === "all"}
             onChange={e => this.props.selectMode(e.target.value)}
           />
           <PrefItem htmlFor="all" id="toolAll">
@@ -25,11 +26,13 @@ class SenderMode extends Component {
             name="senderMode"
             id="activeDialogs"
             value="activeDialogs"
+            checked={this.props.mode === "activeDialogs"}
             onChange={e => this.props.selectMode(e.target.value)}
           />
           <PrefItem htmlFor="activeDialogs" id="toolActive">
             <i className="fas fa-comment-dots" />
           </PrefItem>
+
           <Line horizontal />
 
           <input
@@ -37,6 +40,7 @@ class SenderMode extends Component {
             name="senderMode"
             id="online"
             value="online"
+            checked={this.props.mode === "online"}
             onChange={e => this.props.selectMode(e.target.value)}
           />
           <PrefItem htmlFor="online" id="toolOnline">
@@ -48,6 +52,7 @@ class SenderMode extends Component {
             name="senderMode"
             id="bmAll"
             value="bmAll"
+            checked={this.props.mode === "bmAll"}
             onChange={e => this.props.selectMode(e.target.value)}
           />
           <PrefItem htmlFor="bmAll" id="toolBm">
@@ -59,6 +64,7 @@ class SenderMode extends Component {
             name="senderMode"
             id="listing"
             value="listing"
+            checked={this.props.mode === "listing"}
             onChange={e => this.props.selectMode(e.target.value)}
           />
           <PrefItem htmlFor="listing" id="toolList">
@@ -84,4 +90,8 @@ class SenderMode extends Component {
   }
 }
 
-export default connect()(SenderMode);
+const mapStateToProps = state => ({
+  mode: state.pdReducer.mode
+});
+
+export default connect(mapStateToProps)(SenderMode);

@@ -1,60 +1,49 @@
-import {
-  fetchMales,
-  sendMessage,
-  fetchAllMales,
-  sendMail,
-  sendSticker,
-  likeMale,
-  addToFavorites,
-  sendAttach
-} from "./api";
-import { SET_BOOKMARKS } from "./redux/actions";
+import { fetchMales } from "./api";
 
-export const loadBookmarks = (
-  bmOffset,
-  bookmarks,
+export const loadMales = (
+  offset,
+  arrayMales,
   cursor,
   modelId,
   dispatchFn,
-  finishBmFn
+  finishBmFn,
+  filters,
+  type
 ) => {
   fetchMales(
-    {
-      bookmarked: 1,
-      nomessages: 0,
-      unanswered: 0,
-      onliners: 0
-    },
-    bmOffset,
+    filters,
+    offset,
     data => {
       let cursor = data.cursor;
       data = data.profiles;
 
       if (!data.length) {
         finishBmFn({ bmLoaded: true });
-        return;
       }
 
-      for (let bmIdx = 0; bmIdx < data.length; bmIdx++) {
-        if (bmIdx === data.length - 1) {
-          bmOffset += data.length;
-          loadBookmarks(
-            bmOffset,
-            bookmarks,
+      for (let idx = 0; idx < data.length; idx++) {
+        if (idx === data.length - 1) {
+          offset += data.length;
+          loadMales(
+            offset,
+            arrayMales,
             cursor,
             modelId,
             dispatchFn,
-            finishBmFn
+            finishBmFn,
+            filters,
+            type
           );
         }
 
-        bookmarks.push(data[bmIdx].id);
+        arrayMales.push(data[idx].id);
       }
     },
     cursor
   );
 
-  bookmarks = bookmarks.filter(x => x !== modelId);
-  bookmarks = [...new Set(bookmarks)];
-  dispatchFn({ type: SET_BOOKMARKS, payload: bookmarks });
+  arrayMales = arrayMales.filter(x => x !== modelId);
+  arrayMales = [...new Set(arrayMales)];
+
+  dispatchFn({ type: type, payload: arrayMales });
 };

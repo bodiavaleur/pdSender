@@ -5,9 +5,13 @@ import {
   ModalGroup,
   Modal,
   GalleryImage,
-  TextInfoCredits
+  TextInfoCredits,
+  UserWrapper,
+  UserText,
+  ProfileAvatar,
+  Button
 } from "../../ui/atoms";
-import { SenderPrefs, PrefGroup } from "../../ui/organisms";
+import { SenderPrefs } from "../../ui/organisms";
 import {
   SET_MODE_FILTERS,
   SET_SEARCH_FILTERS,
@@ -19,7 +23,8 @@ import {
   SET_CURRENT_ONLINE,
   SET_LISTING,
   SET_OFFSET_INIT,
-  USE_ONLINE
+  SET_BOOKMARKS,
+  TOGGLE_AUTO_MPM
 } from "../../redux/actions";
 import {
   TOGGLE_BLACKLIST,
@@ -29,15 +34,8 @@ import {
   TOGGLE_PARAMS,
   TOGGLE_LISTING
 } from "../../redux/ui/uiActions";
-import {
-  fetchAllMales,
-  getStickers,
-  getDataDictionary,
-  getMale,
-  fetchMales,
-  getHistory
-} from "../../api";
-import { loadBookmarks } from "../../utils";
+import { fetchAllMales, getStickers, getDataDictionary } from "../../api";
+import { loadMales } from "../../utils";
 import MediaGallery from "../organisms/MediaGallery";
 import Blacklist from "../molecules/Blacklist";
 import { Spring } from "react-spring/renderprops";
@@ -52,7 +50,6 @@ import SendParams from "../organisms/SendParams";
 import Listing from "../organisms/Listing";
 import MessageBlock from "../molecules/MessageBlock";
 import { Tab, TabsWrapper } from "../../ui/molecules";
-import { Redirect } from "react-router-dom";
 import { CircleSpinner } from "react-spinners-kit";
 
 class SenderPage extends Component {
@@ -96,7 +93,6 @@ class SenderPage extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.setOffsetInit = this.setOffsetInit.bind(this);
     this.finishBmLoad = this.finishBmLoad.bind(this);
-    this.test = this.test.bind(this);
   }
 
   onRangeChange(value) {
@@ -132,6 +128,8 @@ class SenderPage extends Component {
         options = { ...options, nomessages: 1 };
         mode = "activeDialogs";
         break;
+      default:
+        return;
     }
 
     if (!!online) {
@@ -225,46 +223,42 @@ class SenderPage extends Component {
   }
 
   componentDidMount() {
-    loadBookmarks(
+    const options = {
+      bookmarked: 1,
+      nomessages: 0,
+      unanswered: 0,
+      onliners: 0
+    };
+
+    loadMales(
       0,
       this.props.bookmarks,
       "",
       this.props.modelData.id,
       this.props.dispatch,
-      this.finishBmLoad
+      this.finishBmLoad,
+      options,
+      SET_BOOKMARKS
     );
     getDataDictionary(dictData => this.setState({ dataDictionary: dictData }));
-    const loadedBlacklist = localStorage.getItem("blacklist");
-
-    if (loadedBlacklist) {
-      const splittedBlacklist = new Set(loadedBlacklist.split(","));
-      console.log(splittedBlacklist);
-      for (let idx of splittedBlacklist) {
-        this.props.dispatch({
-          type: SET_BLACKLIST,
-          payload: idx
-        });
-      }
-    }
-
     getStickers(packs => this.setState({ packs: packs }));
   }
 
-  test() {
-    getHistory(32375252, 30807359, 1560533215, data =>
-      console.log("data :", data)
-    );
-  }
-
   render() {
+    console.log("this.props", this.props.modelData);
     const messages = this.props.message.split(" @ ").filter(x => !!x);
+    const listValue = this.props.list
+      .map(mId => mId.id)
+      .join()
+      .replace(/,/g, "\n");
+
     return (
       <React.Fragment>
         <Spring from={{ opacity: 0 }} to={{ opacity: 1 }}>
           {props => (
             <React.Fragment>
               <ProfileBackground
-                img="https://cdn.themefoxx.com/wp-content/uploads/2018/07/MacBook-Air-2018-Wallpapers-4.jpg"
+                img="https://lh3.googleusercontent.com/67QkZk4pJIAL7tH2EcXK1iKLG-44PFs4bJn-Pt0xPxCBt8ooQhorqqNYoNojy04MaQBRyKt_DMCV6eA2PbDfPVt0NLBSDbqZABArHcNt0YhhZcUP0SoZrk-PfdTD6GBieizIliMVDNJNeOUk0nb15qIWx2_3rBnVwgtrwrnENq7W_obrcJKTGNCni_gg8mHtKiLhScsWsDJxV00xdKq8hbKkaFpTLHsUG3bwjnbr1X03UeQGa0nZhvcvXKgoPvp0z9ejhHd_M4DoJfht62RiAkXudNpvAvmwGY-USltQQh8M79CMtU7LVYT5eDH8X7gehV9p7374JqwSwmZwxdobWK3xLchhkhMo8m9SdDTZ-3odUC0zeno51RHMWw-5qPdx9fXKDsoa7_9LBR9drpVzz_4oPnGroPUrjx_6Bcp5_E4Nt9u-FtsGuJPyg9NdZjtjh1lKhQW_QZA28XZGGJn53PsX3ZsFzi2lZjZ0J6qhZdhYlcCmw-iicwabr5ZOMIHK1e51Y5N3lea71Wguqccsd9E8EzgBmbSFGAHJT4iBD-M8AHI16lfL8kgc9RzW6mCUBq5tBfD8A_nBK7PNTRdyPAf87kp9txicoBbf2xlZi9RkQVXlf7gTSQXnDozs3aLbgnVcD5Rzg4J4w42l9g0oKhR71c6wuNhOO934A8Aur7Au1AbKHkYvVME4lwQe3Qg7pb5sJLTmj-WzPfazfzG6L3l7=w1270-h715-no"
                 style={props}
               />
               <SenderPrefs style={props}>
@@ -275,8 +269,6 @@ class SenderPage extends Component {
                   toggleSendParams={this.toggleSendParams}
                   toggleListing={this.toggleListing}
                 />
-
-                <button onClick={this.test}>test</button>
 
                 <MessageGroup
                   message={this.props.message}
@@ -348,6 +340,7 @@ class SenderPage extends Component {
                     toggleListing={this.toggleListing}
                     toggleUseListing={this.toggleUseListing}
                     handleChange={this.handleChange}
+                    value={listValue}
                   />
                 )}
 
@@ -383,6 +376,20 @@ class SenderPage extends Component {
                   />
                 )}
               </SenderPrefs>
+
+              {this.state.bmLoaded && (
+                <UserWrapper bottom className="text-focus-in">
+                  <ProfileAvatar
+                    w="32px"
+                    h="32px"
+                    src={this.props.modelData.avatar_small}
+                  />
+                  <UserWrapper left>
+                    <UserText>{this.props.modelData.name}</UserText>
+                    <UserText email>{this.props.modelData.occupation}</UserText>
+                  </UserWrapper>
+                </UserWrapper>
+              )}
 
               {!this.state.bmLoaded && (
                 <TextInfoCredits left>
@@ -425,7 +432,8 @@ const mapStateToProps = state => ({
   useRepeat: state.pdReducer.useRepeat,
   searchFilters: state.pdReducer.searchFilters,
   offsetInit: state.pdReducer.offsetInit,
-  useOnline: state.pdReducer.useOnline
+  useOnline: state.pdReducer.useOnline,
+  getBmFn: state.pdReducer.getBmFn
 });
 
 export default connect(mapStateToProps)(SenderPage);

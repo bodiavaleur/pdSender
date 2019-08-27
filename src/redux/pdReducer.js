@@ -26,11 +26,16 @@ import {
   TOGGLE_SET_OFFLINE,
   SET_OFFSET_INIT,
   SET_USER_DATA,
-  USE_ONLINE
+  USE_ONLINE,
+  SET_ARRAY_MALES,
+  SET_ADD_BM_FN,
+  SET_REMOVE_BM_FN,
+  SET_GET_BM_FN,
+  SET_REG_FN
 } from "./actions";
 
 const initialState = {
-  modelData: 0,
+  modelData: [],
   modeFilters: {
     bookmarked: 0,
     nomessages: 0,
@@ -54,7 +59,7 @@ const initialState = {
   },
   mode: "online",
   message: "",
-  mpm: 40,
+  mpm: 20,
   bookmarks: [],
   sendType: "chat",
   attachments: [],
@@ -72,13 +77,34 @@ const initialState = {
   setOffline: false,
   offsetInit: "start",
   user: [],
-  useOnline: false
+  useOnline: false,
+  arrayMales: [],
+  addBmFn: null,
+  removeBmFn: null,
+  getBmFn: null,
+  isRegFn: null
 };
 
+// fix: shitcode
 export default (state = initialState, { type, payload }) => {
   switch (type) {
     case SET_LISTING:
       return { ...state, list: payload };
+
+    case SET_GET_BM_FN:
+      return { ...state, addBmFn: payload };
+
+    case SET_REG_FN:
+      return { ...state, isRegFn: payload };
+
+    case SET_ADD_BM_FN:
+      return { ...state, addBmFn: payload };
+
+    case SET_REMOVE_BM_FN:
+      return { ...state, removeBmFn: payload };
+
+    case SET_ARRAY_MALES:
+      return { ...state, arrayMales: payload };
 
     case SET_USER_DATA:
       return { ...state, user: payload };
@@ -150,7 +176,7 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, sendType: payload };
 
     case SET_BLACKLIST:
-      return { ...state, blacklist: [...state.blacklist, parseInt(payload)] };
+      return { ...state, blacklist: payload };
 
     case DEL_BLACKLIST:
       return {

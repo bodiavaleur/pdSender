@@ -11,7 +11,7 @@ export const Tab = styled.div`
   font-family: "SF Display", Arial, Helvetica, sans-serif;
   font-size: 0.85rem;
   font-weight: bold;
-  color: rgb(0, 0, 0, 0.5);
+  color: rgb(255, 255, 255, 0.5);
   cursor: pointer;
 
   &:nth-child(2) {
@@ -35,6 +35,7 @@ export const Tab = styled.div`
     font-size: 1.5rem;
     color: rgb(0,0,0, 0.5);
     height: 45px;
+    color: rgb(255, 255, 255, 0.5);
     line-height: 45px;
 
     &:nth-child(2) {

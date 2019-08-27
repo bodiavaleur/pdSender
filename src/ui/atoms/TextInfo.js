@@ -29,12 +29,24 @@ export const TextInfoCredits = styled.a`
   justify-content: space-between;
   align-items: center;
   width: 125px;
+  z-index: 9999;
 
   ${({ left }) =>
     left &&
     `
     left: 15px;
     width: 165px;
+    color: white !important;
+  `}
+
+  ${({ center }) =>
+    center &&
+    `
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 200px;
+    font-size: 0.7rem;
     color: white !important;
   `}
 `;

@@ -6,10 +6,12 @@ export const ProfileBackground = styled.div`
   height: 105%;
   top: -2.5%;
   left: -2.5%;
+  transform: scale(1.2);
   filter: blur(20px);
   background-repeat: none;
   background-size: cover;
   background-position: 50% 50%;
   z-index: -1;
+  opacity: 1;
   ${({ img }) => img && `background-image: url(${img})`}
 `;
