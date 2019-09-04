@@ -35,3 +35,4 @@ export const SET_ADD_BM_FN = "SET_ADD_BM_FN";
 export const SET_REMOVE_BM_FN = "SET_REMOVE_BM_FN";
 export const SET_GET_BM_FN = "SET_GET_BM_FN";
 export const SET_REG_FN = "SET_REG_FN";
+export const COMMENT_MAIL = "COMMENT_MAIL";

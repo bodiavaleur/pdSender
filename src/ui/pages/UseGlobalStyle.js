@@ -35,6 +35,11 @@ export const UseGlobalStyle = createGlobalStyle`
     flex-direction: column;
   }
 
+  .disabled {
+    cursor: default;
+    opacity: 0.3;
+  }
+
   .list-group-item{
     display: flex !important;
     justify-content: space-between !important;
@@ -117,6 +122,7 @@ export const UseGlobalStyle = createGlobalStyle`
     -webkit-perspective: 400;
             perspective: 400;
   }
+
   
   .plane {
     width: 120px;

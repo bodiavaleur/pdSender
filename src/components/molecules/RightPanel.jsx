@@ -16,6 +16,9 @@ const RightPanel = props => {
         <PrefItem cubical onClick={props.toggleSendParams} id="sendParams">
           <i className="fas fa-search" />
         </PrefItem>
+        {/* <PrefItem cubical onClick={props.toggleImportantNote} id="sendParams">
+          <i className="fas fa-search" />
+        </PrefItem> */}
         <Link to={process.env.PUBLIC_URL + "/mailing"}>
           <PrefItem cubical onClick={props.startSender}>
             <i className="fas fa-play" />

@@ -5,7 +5,7 @@ import { SELECT_ATTACHMENT } from "../../redux/actions";
 import { TabsWrapper, Tab } from "../../ui/molecules";
 import { getMediaGallery } from "../../api";
 
-class Stickers extends Component {
+class Attachments extends Component {
   constructor(props) {
     super(props);
 
@@ -50,12 +50,10 @@ class Stickers extends Component {
   }
 
   addToAttachment(attach, type) {
-    this.props.dispatch({
+    return this.props.dispatch({
       type: SELECT_ATTACHMENT,
       payload: { ...attach, attachTo: this.props.selectedMessage, type: type }
     });
-
-    return this.props.toggleAttachments();
   }
 
   componentDidMount() {
@@ -165,13 +163,23 @@ class Stickers extends Component {
                 ))
             : null}
           {this.state.showImages &&
-            this.state.images.map(image => (
-              <AttachIcon
-                lg
-                src={image.url_thumbnail}
-                onClick={() => this.addToAttachment(image, "photo")}
-              />
-            ))}
+            this.state.images.map((image, idx) => {
+              console.log(
+                "this.props.attachments, image",
+                this.props.attachments,
+                image,
+                !!this.props.attachments.includes(image)
+              );
+              return (
+                <AttachIcon
+                  key={idx}
+                  lg
+                  selected={!!this.props.attachments.includes([image])}
+                  src={image.url_thumbnail}
+                  onClick={() => this.addToAttachment(image, "photo")}
+                />
+              );
+            })}
         </Modal>
 
         <Shade full onClick={this.props.toggleAttachments} />
@@ -186,4 +194,4 @@ const mapStateToProps = state => ({
   modelData: state.pdReducer.modelData
 });
 
-export default connect(mapStateToProps)(Stickers);
+export default connect(mapStateToProps)(Attachments);

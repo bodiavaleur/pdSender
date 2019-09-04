@@ -30,7 +30,7 @@ export const Modal = styled.div`
      margin: 50px;
      transition: box-shadow 0.2s ease-in, transform 0.3s ease-in;
      &:active {
-       transform: scale(1.05)
+       transform: scale(1.1)
      }
   `}
 

@@ -13,6 +13,13 @@ export const ProfileAvatar = styled.div`
     `
     margin: 20px 0;
   `}
+
+  ${({ cubic }) =>
+    cubic &&
+    `
+  border-radius: 15px;
+  box-shadow: 0 0 3px 3px rgba(20,20,20, 0.3);
+  `}
 `;
 
 export const ProfileText = styled.span`

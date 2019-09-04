@@ -15,6 +15,12 @@ export const SenderPrefs = styled.div`
     width: auto;
   `}
 
+  ${({ finder }) =>
+    finder &&
+    `
+    width: 100%;
+  `}
+
   input:checked + label {
     background-color: rgb(0, 122, 255);
     color: white;
@@ -74,6 +80,14 @@ export const PrefItem = styled.label`
     position: absolute;
     bottom: 1%;
     right: 1%;
+  `}
+
+  ${({ comment }) =>
+    comment &&
+    `
+    position: absolute;
+    bottom: 1%;
+    right: 11%;
   `}
   
   ${({ stop }) =>

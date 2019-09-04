@@ -1,5 +1,5 @@
 const axios = require("axios");
-
+const https = require("https");
 const axs = axios.create({
   baseURL: "https://api.prime.date",
   mode: "cors",
@@ -34,7 +34,9 @@ export const fetchMales = (options, offset, cb, cursor = "") => {
     url: "/connections/get",
     data: data,
     method: "POST"
-  }).then(res => cb(res.data.data));
+  }).then(res => {
+    cb(res.data.data);
+  });
 };
 
 export const fetchAllMales = (page, filters, cb) => {
@@ -42,6 +44,20 @@ export const fetchAllMales = (page, filters, cb) => {
     filters: filters,
     limit: 25,
     page: page
+  };
+
+  axs({
+    url: "/account/search",
+    data: data,
+    method: "POST"
+  }).then(data => cb(data.data.data));
+};
+
+export const fetchParticular = (id, cb) => {
+  const data = {
+    filters: { idUser: id },
+    limit: 25,
+    page: 1
   };
 
   axs({

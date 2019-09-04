@@ -17,8 +17,10 @@ class SendType extends Component {
   }
 
   render() {
+    const w = this.props.vertical ? "70px" : "140px";
+    const h = this.props.vertical ? "140px" : "70px";
     return (
-      <Modal w="140px" h="70px" bg="#efefef" prefGroup>
+      <Modal w={w} h={h} prefGroup>
         <input
           type="radio"
           name="sendType"

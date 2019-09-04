@@ -245,7 +245,6 @@ class SenderPage extends Component {
   }
 
   render() {
-    console.log("this.props", this.props.modelData);
     const messages = this.props.message.split(" @ ").filter(x => !!x);
     const listValue = this.props.list
       .map(mId => mId.id)

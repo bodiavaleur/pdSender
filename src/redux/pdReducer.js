@@ -31,7 +31,8 @@ import {
   SET_ADD_BM_FN,
   SET_REMOVE_BM_FN,
   SET_GET_BM_FN,
-  SET_REG_FN
+  SET_REG_FN,
+  COMMENT_MAIL
 } from "./actions";
 
 const initialState = {
@@ -82,12 +83,16 @@ const initialState = {
   addBmFn: null,
   removeBmFn: null,
   getBmFn: null,
-  isRegFn: null
+  isRegFn: null,
+  mailComment: ""
 };
 
 // fix: shitcode
 export default (state = initialState, { type, payload }) => {
   switch (type) {
+    case COMMENT_MAIL:
+      return { ...state, mailComment: payload };
+
     case SET_LISTING:
       return { ...state, list: payload };
 

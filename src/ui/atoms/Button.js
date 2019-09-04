@@ -26,6 +26,12 @@ export const Button = styled.button`
     background: rgb(225, 69, 58);
   `}
 
+  ${({ disabled }) =>
+    disabled &&
+    `
+    opacity: 0.5;
+  `}
+
   ${({ text }) =>
     text &&
     `

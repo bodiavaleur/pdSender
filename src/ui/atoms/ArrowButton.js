@@ -6,5 +6,5 @@ export const ArrowButton = styled.button`
   top: 5px;
   border: none;
   background: none;
-  margin-left: 20px;
+  z-index: 10;
 `;

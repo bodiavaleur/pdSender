@@ -21,6 +21,7 @@ export const BlockSign = styled.span`
 `;
 
 export const BlockText = styled.span`
+  font-family: "SF Display", Arial;
   font-size: ${props => props.size + "rem"};
   color: rgba(255, 255, 255, 0.5);
   line-height: 2rem;

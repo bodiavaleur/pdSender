@@ -50,7 +50,8 @@ class MailingPage extends Component {
       modelId: 0,
       circleColor: "blue",
       dataCounter: 0,
-      rateLimit: 40
+      rateLimit: 40,
+      audioDone: document.getElementById("audioDone")
     };
 
     this.stopSender = this.stopSender.bind(this);
@@ -99,9 +100,9 @@ class MailingPage extends Component {
           }
 
           if (!!males && this.props.useRepeat === false) {
-            if (this.state.dataCounter >= 3) {
+            if (this.state.dataCounter >= 6) {
               this.setState({ circleColor: "green" });
-
+              this.state.audioDone.play();
               for (let i = 0; i < 99999; i++) {
                 window.clearTimeout(i);
               }
@@ -249,6 +250,25 @@ class MailingPage extends Component {
                     },
                     this.props.attachments
                   );
+
+                  if (this.props.showMailComment && !!this.props.mailComment) {
+                    sendMessage(
+                      data[idx].id,
+                      this.state.modelId,
+                      this.props.mailComment,
+                      resData => {
+                        !this.props.autoMpm &&
+                          this.setMpm(
+                            parseInt(resData.headers["x-rate-limit-remaining"])
+                          );
+                        this.setState({
+                          counter: this.state.counter + 1,
+                          circleColor: "blue",
+                          rateLimit: resData.headers["x-rate-limit-limit"]
+                        });
+                      }
+                    );
+                  }
                 }
 
                 if (this.props.likeUser) {
@@ -484,7 +504,9 @@ const mapStateToProps = state => ({
   searchFilters: state.pdReducer.searchFilters,
   setOffline: state.pdReducer.setOffline,
   offsetInit: state.pdReducer.offsetInit,
-  useOnline: state.pdReducer.useOnline
+  useOnline: state.pdReducer.useOnline,
+  showMailComment: state.uiReducer.showMailComment,
+  mailComment: state.pdReducer.mailComment
 });
 
 export default connect(mapStateToProps)(MailingPage);

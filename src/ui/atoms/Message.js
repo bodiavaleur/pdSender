@@ -27,8 +27,7 @@ export const Message = styled.textarea`
   ${({ input }) =>
     input &&
     `
-    width: 75px;
-    height: 100px;
+
     background: linear-gradient(0deg, rgba(89,89,89,1) 0%, rgba(118,118,118,1) 100%);
     width: 90%;
     height: 85%;

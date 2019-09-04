@@ -42,6 +42,7 @@ import "firebase/auth";
 import firebaseConfig from "./firebase/firebaseConfig";
 import PrivateRoute from "./components/atoms/PrivateRoute";
 import { PageWrapper } from "./ui/pages/Login";
+import FinderPage from "./components/pages/FinderPage";
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 const firebaseAppAuth = firebaseApp.auth();
@@ -146,11 +147,6 @@ class PrimeDate extends Component {
         .ref("/modelsArray/")
         .once("value")
         .then(snapshot => {
-          console.log("object", snapshot.val().array);
-          console.log(
-            "array.includes(model.id)",
-            snapshot.val().array.includes(31596719)
-          );
           cb(snapshot.val().array);
         });
     fetchFemaleData(modelList => {
@@ -209,12 +205,6 @@ class PrimeDate extends Component {
       .ref("/blacklist/" + this.props.modelData.id)
       .once("value")
       .then(snapshot => {
-        console.log(
-          `/blacklist/${this.props.modelData.id}/${Object.keys(
-            snapshot.val()
-          ).find(key => snapshot.val()[key] === id)}`,
-          snapshot.val()
-        );
         firebase
           .database()
           .ref(
@@ -296,6 +286,12 @@ class PrimeDate extends Component {
             exact
             path={process.env.PUBLIC_URL + "/magic"}
             component={MagicPage}
+          />
+          <PrivateRoute
+            isLoggedIn={isLoggedIn}
+            exact
+            path={process.env.PUBLIC_URL + "/finder"}
+            component={FinderPage}
           />
           <Route
             exact

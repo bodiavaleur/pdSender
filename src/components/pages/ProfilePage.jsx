@@ -9,7 +9,7 @@ import {
 import { connect } from "react-redux";
 import { Spring } from "react-spring/renderprops";
 import { fetchFemaleData } from "../../api";
-import { ProfilePageWrapper } from "../../ui/pages";
+import { ProfilePageWrapper, BlockText } from "../../ui/pages";
 import { Link } from "react-router-dom";
 class ProfilePage extends Component {
   constructor(props) {
@@ -17,12 +17,9 @@ class ProfilePage extends Component {
 
     this.state = {
       data: [],
-      selectedIdx: null
+      selectedIdx: null,
+      showError: false
     };
-  }
-
-  componentWillMount() {
-    fetchFemaleData(data => this.setState({ data: data }));
   }
 
   selectFemale(idx) {
@@ -32,9 +29,16 @@ class ProfilePage extends Component {
     };
   }
 
+  componentWillMount() {
+    fetchFemaleData(data => this.setState({ data: data }));
+  }
+
+  componentDidMount() {
+    setTimeout(() => this.setState({ showError: true }), 3000);
+  }
+
   render() {
     const data = this.state.data;
-    console.log("data :", data);
     return (
       <ProfilePageWrapper profile>
         <Spring from={{ opacity: 0 }} to={{ opacity: 0.7 }}>
@@ -74,7 +78,11 @@ class ProfilePage extends Component {
                       </Modal>
                     </Link>
                   ))
-                : null}
+                : this.state.showError && (
+                    <BlockText className="text-focus-in" size="5">
+                      No profiles
+                    </BlockText>
+                  )}
             </React.Fragment>
           )}
         </Spring>

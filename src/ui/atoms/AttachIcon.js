@@ -7,6 +7,9 @@ export const AttachIcon = styled.div`
   background-size: cover;
   margin: 2.5px;
   position: relative;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 
   ${({ xs }) =>
     xs &&
@@ -27,6 +30,10 @@ export const AttachIcon = styled.div`
     width: 100px;
     height: 100px;
   `}
+
+  &:active {
+    transform: scale(1.1);
+  }
 `;
 
 export const AttachIconLabel = styled.span`

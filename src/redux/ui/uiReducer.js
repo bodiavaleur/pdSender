@@ -7,7 +7,9 @@ import {
   TOGGLE_MAILING_PAGE,
   TOGGLE_ATTACHMENTS,
   TOGGLE_PARAMS,
-  TOGGLE_LISTING
+  TOGGLE_LISTING,
+  TOGGLE_MAIL_COMMENT,
+  TOGGLE_IMPORTANT_NOTE
 } from "./uiActions";
 
 const initialState = {
@@ -19,11 +21,19 @@ const initialState = {
   showMailingPage: false,
   showAttachments: false,
   showSendParams: false,
-  showListing: false
+  showListing: false,
+  showMailComment: false,
+  showImportantNote: false
 };
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
+    case TOGGLE_IMPORTANT_NOTE:
+      return { ...state, showImportantNote: !state.showImportantNote };
+
+    case TOGGLE_MAIL_COMMENT:
+      return { ...state, showMailComment: !state.showMailComment };
+
     case TOGGLE_LISTING:
       return { ...state, showListing: !state.showListing };
 

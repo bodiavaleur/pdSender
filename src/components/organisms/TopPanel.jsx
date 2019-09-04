@@ -40,6 +40,8 @@ class TopPanel extends Component {
   }
 
   render() {
+    const isModel = this.props.modelData.id;
+    console.log("isModel :", this.props.modelData);
     return (
       <React.Fragment>
         <Spring
@@ -63,7 +65,13 @@ class TopPanel extends Component {
                     </NavbarItem>
                   </Link>
 
-                  <Link to={process.env.PUBLIC_URL + "/sender"}>
+                  <Link
+                    to={
+                      process.env.PUBLIC_URL +
+                      (isModel ? "/sender" : "/profile")
+                    }
+                    className={isModel ? "" : "disabled"}
+                  >
                     <NavbarItem>
                       <NavbarItemIcon>
                         <i className="far fa-paper-plane" />
@@ -72,12 +80,32 @@ class TopPanel extends Component {
                     </NavbarItem>
                   </Link>
 
-                  <Link to={process.env.PUBLIC_URL + "/magic"}>
+                  <Link
+                    to={
+                      process.env.PUBLIC_URL + (isModel ? "/magic" : "/profile")
+                    }
+                    className={isModel ? "" : "disabled"}
+                  >
                     <NavbarItem>
                       <NavbarItemIcon>
                         <i className="fas fa-magic" />
                       </NavbarItemIcon>
                       <NavbarItemLabel>Magic</NavbarItemLabel>
+                    </NavbarItem>
+                  </Link>
+
+                  <Link
+                    to={
+                      process.env.PUBLIC_URL +
+                      (isModel ? "/finder" : "/profile")
+                    }
+                    className={isModel ? "" : "disabled"}
+                  >
+                    <NavbarItem>
+                      <NavbarItemIcon>
+                        <i className="fas fa-address-card"></i>
+                      </NavbarItemIcon>
+                      <NavbarItemLabel>Finder(TEST)</NavbarItemLabel>
                     </NavbarItem>
                   </Link>
                 </NavbarWrapper>
@@ -108,7 +136,8 @@ class TopPanel extends Component {
 
 const mapStateToProps = state => ({
   showTopPanel: state.uiReducer.showTopPanel,
-  showSenderPage: state.uiReducer.showSenderPage
+  showSenderPage: state.uiReducer.showSenderPage,
+  modelData: state.pdReducer.modelData
 });
 
 export default connect(mapStateToProps)(TopPanel);

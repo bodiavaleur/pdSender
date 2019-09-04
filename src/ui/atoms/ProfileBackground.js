@@ -14,4 +14,5 @@ export const ProfileBackground = styled.div`
   z-index: -1;
   opacity: 1;
   ${({ img }) => img && `background-image: url(${img})`}
+  ${({ center }) => center && `background-position: 100%;`}
 `;

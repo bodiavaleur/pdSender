@@ -22,5 +22,6 @@ export { Line } from "./Line";
 export { IconButton } from "./IconButton";
 export { Button, ButtonLabel } from "./Button";
 export { Logo } from "./Logo";
+export { FinderText } from "./FinderText";
 export { FlexContainer } from "./FlexContainer";
 export { UserText, UserWrapper } from "./User";
