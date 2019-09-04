@@ -248,6 +248,7 @@ class MailingPage extends Component {
                         rateLimit: data.headers["x-rate-limit-limit"]
                       }));
                     },
+                    this.props.attachments,
                     this.props.attachments
                   );
 
